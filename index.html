@@ -2610,9 +2610,9 @@
               <el-table-column label="操作" width="200">
                 <template slot-scope="scope">
                   <el-button size="mini" type="success" @click="openLocalUpgrade(scope.row)"
-                    :disabled="!wsConnected">近端升级</el-button>
+                    :disabled="!wsConnected || scope.row.is_upgrading">近端升级</el-button>
                   <el-button size="mini" type="primary" @click="startOta(scope.row.ip, scope.row.loader_num)"
-                    :disabled="!wsConnected">远端升级</el-button>
+                    :disabled="!wsConnected || scope.row.is_upgrading">远端升级</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -2642,8 +2642,11 @@
             <span slot="footer" class="dialog-footer">
               <el-button size="mini" @click="dialogLocalUpgradeVisible = false"
                 :disabled="localUpgradeLoading">取消</el-button>
-              <el-button size="mini" type="primary" :disabled="!localUpgradePath || localUpgradeLoading"
-                :loading="localUpgradeLoading" @click="confirmLocalUpgrade">开始近端升级</el-button>
+              <el-button size="mini" type="primary"
+                :disabled="!localUpgradePath || localUpgradeLoading || isAnyDeviceUpgrading"
+                :loading="localUpgradeLoading" @click="confirmLocalUpgrade">
+                {{ isAnyDeviceUpgrading ? '有设备正在升级中' : '开始近端升级' }}
+              </el-button>
             </span>
           </el-dialog>
 
@@ -4355,6 +4358,27 @@ current_output_gain:0.5`
           // 只要模型正在运行就可以停止，不需要选择模型路径
           return this.deviceConnected && this.isModelRunning;
         },
+        isAnyDeviceUpgrading() {
+          // 1. 优先检查 connectStatus (后端推送的实时状态，最为准确)
+          const raw = this.connectStatus && typeof this.connectStatus === 'object' ? this.connectStatus : {};
+          for (const items of Object.values(raw)) {
+            if (!Array.isArray(items)) continue;
+            for (const item of items) {
+              if (!item) continue;
+              const devs = Array.isArray(item.value) ? item.value : [item];
+              for (const d of devs) {
+                if (d && d.is_upgrade) return true;
+              }
+            }
+          }
+
+          // 2. 检查 otaStatus (前端维护的升级队列)
+          // 主要用于发起升级请求后，到后端更新 is_upgrade 之前的短暂延迟
+          const isUpgradingInOtaStatus = Object.values(this.otaStatus).some(st => st && st.status === 'running');
+          if (isUpgradingInOtaStatus) return true;
+
+          return false;
+        },
         hasConnectStatus() {
           return this.connectStatus && typeof this.connectStatus === 'object' && Object.keys(this.connectStatus).length > 0;
         },
@@ -4450,7 +4474,8 @@ current_output_gain:0.5`
               sn: d.sn || cloud.sn || '',
               running_text: (this.toBool(d.running) ? '运行中' : '未运行'),
               current_version: d.version || cloud.current_version || '',
-              target_version: cloud.target_version || ''
+              target_version: cloud.target_version || '',
+              is_upgrading: !!d.is_upgrade || (this.otaStatus[k] && this.otaStatus[k].status === 'running')
             });
           };
 
@@ -7160,6 +7185,43 @@ current_output_gain:0.5`
           // 监听 loader 连接/运行状态推送（socket.md：name=get_connect_status）
           wsClient.on('get_connect_status', (data) => {
             self.connectStatus = data || {};
+
+            // 同步升级状态到 otaStatus，确保刷新后能正确禁用按钮和显示进度
+            try {
+              const raw = self.connectStatus && typeof self.connectStatus === 'object' ? self.connectStatus : {};
+              for (const items of Object.values(raw)) {
+                if (!Array.isArray(items)) continue;
+                for (const item of items) {
+                  if (!item) continue;
+                  const devs = Array.isArray(item.value) ? item.value : [item];
+                  for (const d of devs) {
+                    const k = self.otaKey(d.ip, d.loader_num);
+                    if (d && d.is_upgrade) {
+                      // 只要后端说是正在升级，且前端不是处于“成功”这种终态，就强制同步为 running
+                      // 这样即使刷新页面，只要后端还在报 is_upgrade，前端就能恢复状态
+                      if (!self.otaStatus[k] || self.otaStatus[k].status !== 'success') {
+                        if (!self.otaStatus[k] || self.otaStatus[k].status !== 'running') {
+                          self.$set(self.otaStatus, k, { status: 'running', desc: '正在升级...' });
+                        }
+                      }
+                    } else {
+                      // 后端上报不在升级状态
+                      // 注意：不要在这里轻易设置 status = 'error'，否则会导致进度条闪现红色（exception）
+                      if (self.otaStatus[k] && self.otaStatus[k].status === 'running') {
+                        const p = self.otaProgress[k] || 0;
+                        if (p >= 100) {
+                          self.$set(self.otaStatus, k, { status: 'success', desc: '升级成功' });
+                        }
+                        // 进度不足 100% 且 is_upgrade 为 false，保持 running，直到 update_loaders 推送最终结果
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('[UI] OTA status sync from connectStatus failed:', e);
+            }
+
             // 更新最后收到消息的时间戳
             self.lastConnectStatusTime = Date.now();
             // 收到消息后重置请求标志
