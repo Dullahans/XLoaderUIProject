@@ -241,10 +241,10 @@ sim_type:运行方式的区别，回灌：data_replay,模型:component_emulation
     "name":"obtain_loader_dir_structure",
     "data":{
         "result":[
-            {"label":"project1"},
-            {"label":"model"},
-            {"label":"example.zip"},
-            {"label":"loader110_config.yml"}
+            {"label":"project1", "type":"folder"},
+            {"label":"model", "type":"folder"},
+            {"label":"example.zip", "type":"file"},
+            {"label":"loader110_config.yml", "type":"file"}
         ]
     }
 }
@@ -259,9 +259,9 @@ sim_type:运行方式的区别，回灌：data_replay,模型:component_emulation
     "name":"obtain_loader_dir_structure",
     "data":{
         "result":[
-            {"label":"test1"},
-            {"label":"test2"},
-            {"label":"example.zip"},
+            {"label":"test1", "type":"folder"},
+            {"label":"test2", "type":"folder"},
+            {"label":"example.zip", "type":"file"},
         ]
     }
 }
@@ -289,6 +289,9 @@ sim_type:运行方式的区别，回灌：data_replay,模型:component_emulation
         "desc":""
     }
 }
+
+
+
 
 12.从云端导入模型
 请求
@@ -699,4 +702,30 @@ sim_type:运行方式的区别，回灌：data_replay,模型:component_emulation
     ...
     "name":"stop_refresh_regs",
     "data":{"ret":true,"desc":"success"}
+}
+
+33.批量导入模型文件
+请求（导入当前设备）
+{
+    ...
+    "name":"load_model_batch",
+    "data":"{\"device_id\":\"127.0.0.1\",\"loader_num\":0,\"models_list\":\[\"model\\\\test.bin\",\"model\\\\test1.bin\"\]}"
+}
+每导入完成一个文件，返回一次结果
+{
+    ...
+    "name":"load_model_batch",
+    "data":{
+        "ret":true,
+        "desc":""
+    }
+}
+当所有文件都导入结束，不管是否都成功返回：
+{
+    ...
+    "name":"load_model_batch",
+    "data":{
+        "ret":true,
+        "desc":"Finished"
+    }
 }

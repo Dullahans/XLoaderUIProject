@@ -3263,11 +3263,12 @@
                 :loading="resourceTreeLoading">刷新</el-button>
             </div>
 
-            <div v-loading="resourceTreeLoading"
+            <div v-loading="resourceTreeLoading || resourceLoadingCount > 0"
               style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px;">
-              <el-tree :key="resourceTreeKey" :props="{ label: 'label', children: 'children', isLeaf: 'isLeaf' }" lazy
-                :load="loadResourceNode" @node-click="handleResourceNodeClick" @node-expand="handleResourceNodeExpand"
-                highlight-current>
+              <el-tree :key="resourceTreeKey" node-key="path"
+                :props="{ label: 'label', children: 'children', isLeaf: 'isLeaf' }" lazy :load="loadResourceNode"
+                show-checkbox ref="resourceTree" @check="handleResourceCheck" @node-expand="handleResourceNodeExpand"
+                :expand-on-click-node="false" @node-click="handleResourceNodeClick">
                 <span slot-scope="{ node, data }" style="display: flex; align-items: center; gap: 8px;">
                   <i :class="node.isLeaf ? 'el-icon-document' : 'el-icon-folder'" style="color: var(--text-muted);"></i>
                   <span>{{ data.label }}</span>
@@ -3275,14 +3276,17 @@
               </el-tree>
             </div>
 
-            <div v-if="selectedResourcePath" style="margin-top: 15px; font-size: 12px; color: var(--primary-color);">
-              <strong>已选择导入路径:</strong> {{ selectedResourcePath }}
+            <div v-if="selectedResourceNodes.length" style="margin-top: 15px; font-size: 12px; color: var(--primary-color);">
+              <strong>已选择 {{ selectedResourceNodes.length }} 个资源</strong>
+              <span v-if="resourceLoadingCount > 0" style="margin-left: 10px; color: var(--text-muted);">
+                <i class="el-icon-loading"></i> 正在递归加载子目录...
+              </span>
             </div>
 
             <div slot="footer">
-              <el-button size="mini" @click="dialogImportDeviceVisible = false">取消</el-button>
+              <el-button size="mini" @click="dialogImportDeviceVisible = false" :disabled="isImporting">取消</el-button>
               <el-button size="mini" type="primary" @click="confirmImportDevice"
-                :disabled="!selectedResourcePath">开始导入</el-button>
+                :disabled="!selectedResourceNodes.length || isImporting || resourceLoadingCount > 0" :loading="isImporting">开始导入</el-button>
             </div>
           </el-dialog>
 
@@ -3978,6 +3982,11 @@
         return this.request('pull_loader_log', { device_id, loader_num, path });
       }
 
+      // --- 33 批量导入模型文件（load_model_batch） ---
+      loadModelBatch(device_id, loader_num, models_list) {
+        return this.request('load_model_batch', { device_id, loader_num, models_list });
+      }
+
       // --- 文件操作（非 socket.md 标准，供 Python FastAPI 后端使用） ---
       saveFile(device_sn, filename, content) {
         return this.request('file.save', { device_sn, filename, content });
@@ -4144,8 +4153,11 @@ current_output_gain:0.5`
         fetchTreeData: [],
         selectedLogPath: '', // 选中的日志文件路径
         selectedResourcePath: '', // 选中的资源文件路径（用于导入设备）
+        selectedResourceNodes: [], // 选中的资源节点列表
         resourceTreeLoading: false, // 资源树加载状态
         resourceTreeKey: 0, // 用于强制刷新资源树的 key
+        resourceLoadingCount: 0, // 正在加载的资源节点数量
+        isImporting: false, // 是否正在导入中
 
         // 设备规格配置（从 device_specs.json 加载）
         deviceSpecsConfig: null,
@@ -6796,6 +6808,7 @@ current_output_gain:0.5`
           }
         },
         async loadResourceNode(node, resolve) {
+          this.resourceLoadingCount++;
           try {
             let path = 'loader';
             if (node.level > 0) {
@@ -6816,43 +6829,102 @@ current_output_gain:0.5`
 
             const nodes = list.map(item => {
               const label = item.label || '';
-              // 需求：如果文件名中未带 .xxx 结尾，都默认为目录
-              const isLeaf = label.indexOf('.') !== -1;
+              // 优先使用后端返回的 type 字段判断是否为文件 (type: 'file' | 'folder')
+              let isLeaf = false;
+              if (item.type) {
+                isLeaf = (item.type === 'file');
+              } else {
+                // 如果后端没传 type，则退而求其次根据文件名中是否包含 '.' 来判断
+                isLeaf = (label.indexOf('.') !== -1);
+              }
+
               return {
                 label,
                 isLeaf,
-                path: path + '/' + label
+                type: item.type || (isLeaf ? 'file' : 'folder'),
+                path: (node.level > 0 ? node.data.path + '/' : 'loader/') + label
               };
             });
 
             resolve(nodes);
+
+            // 如果父节点是被勾选状态，新加载的子节点也自动勾选
+            this.$nextTick(() => {
+              const tree = this.$refs.resourceTree;
+              if (tree && node.checked) {
+                nodes.forEach(item => {
+                  tree.setChecked(item.path, true);
+                  // 如果子节点又是文件夹，递归触发展开
+                  const childNode = tree.getNode(item.path);
+                  if (childNode && !childNode.isLeaf) {
+                    childNode.expand();
+                  }
+                });
+              }
+            });
           } catch (err) {
             console.error('[ResourceTree] Load failed:', err);
             this.$message.error('加载资源列表失败: ' + err.message);
             resolve([]);
+          } finally {
+            this.resourceLoadingCount--;
+          }
+        },
+        handleResourceCheck(data, info) {
+          const tree = this.$refs.resourceTree;
+          const node = tree.getNode(data);
+
+          if (node && !node.isLeaf) {
+            // 如果文件夹被勾选
+            if (node.checked) {
+              // 1. 如果尚未展开，触发加载
+              if (!node.expanded) {
+                node.expand();
+              } else {
+                // 2. 如果已展开，递归勾选所有已存在的子节点
+                const checkDescendants = (n) => {
+                  n.childNodes.forEach(child => {
+                    tree.setChecked(child.data.path, true);
+                    if (!child.isLeaf) {
+                      if (!child.expanded) child.expand();
+                      else checkDescendants(child);
+                    }
+                  });
+                };
+                checkDescendants(node);
+              }
+            }
+          }
+          
+          this.$nextTick(() => {
+            this.selectedResourceNodes = tree.getCheckedNodes();
+          });
+        },
+        handleResourceCheckChange() {
+          if (this.$refs.resourceTree) {
+            this.selectedResourceNodes = this.$refs.resourceTree.getCheckedNodes();
           }
         },
         handleResourceNodeClick(data, node) {
-          // 仅当是文件（带 . 的名称）时才允许选中路径
-          if (data.label && data.label.indexOf('.') !== -1) {
-            // buildFullPath 返回的是从 level 1 开始的路径，
-            // 即相对于 loader/ 目录的相对路径（例如 "project1/example.bin"）
-            this.selectedResourcePath = this.buildFullPath(node);
-          } else {
-            this.selectedResourcePath = '';
-          }
+          // 点击节点文字或图标时，也切换勾选状态
+          const tree = this.$refs.resourceTree;
+          // 直接操作 node 的 checked 属性
+          tree.setChecked(data.path, !node.checked);
+          // 手动触发一次 check 逻辑以实现自动展开
+          this.handleResourceCheck(data, null);
         },
         handleLoadModelToDevice() {
           // 重置选择并打开弹窗
-          this.selectedResourcePath = '';
+          this.selectedResourceNodes = [];
           this.importDeviceType = 'current';
           this.dialogImportDeviceVisible = true;
+          this.isImporting = false;
           // 每次打开也尝试刷新一下
           this.resourceTreeKey++;
         },
         refreshResourceTree() {
           this.resourceTreeKey++;
-          this.selectedResourcePath = '';
+          this.selectedResourceNodes = [];
         },
         handleResourceNodeExpand(data, node) {
           // 需求：用户可以反复点击目录前的小三角按钮去刷新当前目录下有哪些文件
@@ -6861,36 +6933,90 @@ current_output_gain:0.5`
           node.loadData();
         },
         async confirmImportDevice() {
-          if (!this.selectedResourcePath) {
-            this.$message.warning('请先选择要导入的文件');
+          if (!this.selectedResourceNodes.length) {
+            this.$message.warning('请先选择要导入的文件或文件夹');
+            return;
+          }
+
+          if (this.resourceLoadingCount > 0) {
+            this.$message.warning('正在加载目录内容，请稍候...');
             return;
           }
 
           try {
-            const modelzip = this.selectedResourcePath;
-            // 提取 project 名：路径的第一级目录名，或者是文件名去掉扩展名
-            const parts = modelzip.split('/');
-            const project = parts.length > 1 ? parts[0] : modelzip.split('.')[0];
+            this.isImporting = true;
+            
+            const models_list = [];
+            const tree = this.$refs.resourceTree;
+            
+            // 获取所有选中的叶子节点（即文件）
+            // 参数1: true 表示仅返回叶子节点
+            // 参数2: false 表示不包含半选状态
+            const checkedLeafNodesData = tree.getCheckedNodes(true, false);
+            
+            checkedLeafNodesData.forEach(data => {
+              const node = tree.getNode(data);
+              if (node) {
+                const path = this.buildFullPath(node);
+                if (path) {
+                  models_list.push(path);
+                }
+              }
+            });
 
-            const allDevices = this.importDeviceType === 'all';
-
-            this.$message.info(`正在准备导入: ${modelzip}...`);
-
-            let resp;
-            if (allDevices) {
-              // 导入所有设备：不需要 device_id 和 loader_num
-              resp = await wsClient.loadModel(null, null, modelzip, project, true);
-            } else {
-              // 导入当前设备
-              resp = await wsClient.loadModel(this.device_id, this.loader_num, modelzip, project, false);
+            // 兜底：如果没有叶子节点（可能选中的本身就是空文件夹或者后端还没返回文件）
+            // 如果确实没找到文件，再考虑文件夹路径
+            if (models_list.length === 0) {
+              const allCheckedNodesData = tree.getCheckedNodes(false, false);
+              allCheckedNodesData.forEach(data => {
+                const node = tree.getNode(data);
+                if (node) {
+                  const path = this.buildFullPath(node);
+                  if (path) models_list.push(path);
+                }
+              });
             }
 
+            if (models_list.length === 0) {
+              this.$message.warning('未找到有效的导入路径');
+              this.isImporting = false;
+              return;
+            }
+
+            // 去重并过滤掉根目录 'loader' 本身（如果有的话）
+            const unique_models_list = [...new Set(models_list)].filter(p => p !== 'loader');
+
+            this.$message.info(`正在开始批量导入 ${unique_models_list.length} 个文件...`);
+
+            // 先注册监听器处理进度推送
+            const progressHandler = (data) => {
+              const payload = (data && data.data !== undefined) ? data.data : data;
+              if (payload.desc === 'Finished') {
+                this.$message.success('已完成模型导入');
+                wsClient.off('load_model_batch', progressHandler);
+                this.isImporting = false;
+                this.dialogImportDeviceVisible = false;
+              } else {
+                if (payload.ret) {
+                  this.$message.success(payload.desc || '一个文件导入成功');
+                } else {
+                  this.$message.error('导入出错: ' + (payload.desc || '未知错误'));
+                }
+              }
+            };
+            
+            wsClient.on('load_model_batch', progressHandler);
+
+            const resp = await wsClient.loadModelBatch(this.device_id, this.loader_num, unique_models_list);
             const payload = (resp && resp.data !== undefined) ? resp.data : resp;
-            if (payload && payload.ret === false) throw new Error(payload.desc || 'load_model failed');
-            this.$message.success((payload && payload.desc) || `导入指令已发送（${allDevices ? '所有设备' : '当前设备'}）`);
-            this.dialogImportDeviceVisible = false;
+            
+            if (payload && payload.ret === false) {
+              throw new Error(payload.desc || '批量导入请求失败');
+            }
+
           } catch (err) {
             this.$message.error('导入失败: ' + (err.message || err));
+            this.isImporting = false;
           }
         },
         async handleDownloadCloudModel() {
