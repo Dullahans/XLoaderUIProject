@@ -4119,8 +4119,9 @@ current_output_gain:0.5`
         otaLoading: false,
         otaGroups: [],
         otaProgress: {}, // key: `${ip}#${loader_num}` -> number(0-100)
-        otaStatus: {},   // key -> { status, desc }
+        otaStatus: {},   // key -> { status, desc, lastUpdate }
         otaUpdatingKey: '',
+        otaTimeoutTimer: null, // OTA 超时检查定时器
         otaCloudStatus: 'never', // never | ok | empty | error
         otaCloudMsg: '',
         otaCloudCheckedAt: '',
@@ -5194,6 +5195,15 @@ current_output_gain:0.5`
         otaKey(ip, loader_num) {
           return `${String(ip)}#${Number(loader_num)}`;
         },
+        /**
+         * 统一更新 OTA 状态，记录最后更新时间
+         */
+        updateOtaStatus(key, statusObj) {
+          this.$set(this.otaStatus, key, {
+            ...statusObj,
+            lastUpdate: Date.now()
+          });
+        },
         getOtaProgress(ip, loader_num) {
           const k = this.otaKey(ip, loader_num);
           const v = this.otaProgress[k];
@@ -5248,14 +5258,14 @@ current_output_gain:0.5`
           if (!this.wsConnected) return;
           const k = this.otaKey(ip, loader_num);
           this.otaUpdatingKey = k;
-          this.$set(this.otaStatus, k, { status: 'running', desc: '已发起升级' });
+          this.updateOtaStatus(k, { status: 'running', desc: '已发起升级' });
           this.$message.success('升级请求已发送');
           try {
             const resp = await wsClient.updateOneLoader(String(ip), Number(loader_num));
             const payload = (resp && resp.data !== undefined) ? resp.data : resp;
             if (payload && payload.ret === false) throw new Error(payload.desc || 'update failed');
           } catch (err) {
-            this.$set(this.otaStatus, k, { status: 'error', desc: err.message || '升级失败' });
+            this.updateOtaStatus(k, { status: 'error', desc: err.message || '升级失败' });
             this.$message.error('升级失败: ' + (err.message || err));
           } finally {
             this.otaUpdatingKey = '';
@@ -5296,7 +5306,7 @@ current_output_gain:0.5`
           
           // 立即显示已启动状态
           this.$message.success('近端升级已启动');
-          this.$set(this.otaStatus, k, { status: 'running', desc: '近端升级中…' });
+          this.updateOtaStatus(k, { status: 'running', desc: '近端升级中…' });
           this.otaUpdatingKey = k;
 
           try {
@@ -7129,6 +7139,8 @@ current_output_gain:0.5`
 
             // 启动 get_connect_status 监控定时器
             self.startConnectStatusMonitor();
+            // 启动 OTA 超时监控定时器
+            self.startOtaTimeoutMonitor();
           });
 
           wsClient.on('disconnected', () => {
@@ -7136,6 +7148,7 @@ current_output_gain:0.5`
             self.$message.warning('WebSocket 连接已断开');
             // 清除监控定时器
             self.stopConnectStatusMonitor();
+            self.stopOtaTimeoutMonitor();
             // 断开连接时将所有设备状态置灰
             self.markAllDevicesAsDisconnected();
           });
@@ -7201,7 +7214,10 @@ current_output_gain:0.5`
                       // 这样即使刷新页面，只要后端还在报 is_upgrade，前端就能恢复状态
                       if (!self.otaStatus[k] || self.otaStatus[k].status !== 'success') {
                         if (!self.otaStatus[k] || self.otaStatus[k].status !== 'running') {
-                          self.$set(self.otaStatus, k, { status: 'running', desc: '正在升级...' });
+                          self.updateOtaStatus(k, { status: 'running', desc: '正在升级...' });
+                        } else {
+                          // 如果已经是 running，也要更新时间戳，表示后端确认还在升级
+                          self.otaStatus[k].lastUpdate = Date.now();
                         }
                       }
                     } else {
@@ -7210,7 +7226,7 @@ current_output_gain:0.5`
                       if (self.otaStatus[k] && self.otaStatus[k].status === 'running') {
                         const p = self.otaProgress[k] || 0;
                         if (p >= 100) {
-                          self.$set(self.otaStatus, k, { status: 'success', desc: '升级成功' });
+                          self.updateOtaStatus(k, { status: 'success', desc: '升级成功' });
                         }
                         // 进度不足 100% 且 is_upgrade 为 false，保持 running，直到 update_loaders 推送最终结果
                       }
@@ -7289,12 +7305,12 @@ current_output_gain:0.5`
               
               if (p >= 100) {
                 // 进度达到 100% 时直接标记为成功
-                self.$set(self.otaStatus, k, { status: 'success', desc: '升级成功' });
+                self.updateOtaStatus(k, { status: 'success', desc: '升级成功' });
                 if (self.otaUpdatingKey === k) {
                   self.otaUpdatingKey = '';
                 }
               } else {
-                self.$set(self.otaStatus, k, { status: 'running', desc: `升级中… ${Number.isFinite(p) ? p.toFixed(1) : ''}%` });
+                self.updateOtaStatus(k, { status: 'running', desc: `升级中… ${Number.isFinite(p) ? p.toFixed(1) : ''}%` });
               }
             } catch (e) { }
           });
@@ -7309,7 +7325,7 @@ current_output_gain:0.5`
               const st = data && data.loader_ota_status ? String(data.loader_ota_status) : '';
               const ok = st.toLowerCase() === 'success';
               self.$set(self.otaProgress, k, ok ? 100 : (self.otaProgress[k] || 0));
-              self.$set(self.otaStatus, k, { status: ok ? 'success' : 'error', desc: (data && data.desc) || st || (ok ? 'success' : 'failed') });
+              self.updateOtaStatus(k, { status: ok ? 'success' : 'error', desc: (data && data.desc) || st || (ok ? 'success' : 'failed') });
               // 清除升级标记
               if (self.otaUpdatingKey === k) {
                 self.otaUpdatingKey = '';
@@ -7343,6 +7359,54 @@ current_output_gain:0.5`
             clearInterval(this.connectStatusCheckTimer);
             this.connectStatusCheckTimer = null;
           }
+        },
+
+        /**
+         * 启动 OTA 超时监控定时器
+         * 每5秒检查一次
+         */
+        startOtaTimeoutMonitor() {
+          this.stopOtaTimeoutMonitor();
+          this.otaTimeoutTimer = setInterval(() => {
+            this.checkOtaTimeout();
+          }, 5000);
+        },
+
+        /**
+         * 停止 OTA 超时监控定时器
+         */
+        stopOtaTimeoutMonitor() {
+          if (this.otaTimeoutTimer) {
+            clearInterval(this.otaTimeoutTimer);
+            this.otaTimeoutTimer = null;
+          }
+        },
+
+        /**
+         * 检查 OTA 任务是否超时（30秒无响应）
+         */
+        checkOtaTimeout() {
+          const now = Date.now();
+          const timeoutMs = 30000; // 30秒超时
+
+          Object.keys(this.otaStatus).forEach(key => {
+            const st = this.otaStatus[key];
+            if (st && st.status === 'running') {
+              const lastUpdate = st.lastUpdate || 0;
+              if (lastUpdate > 0 && (now - lastUpdate > timeoutMs)) {
+                console.warn(`[OTA] 任务超时 (${key}): 30s 无响应，自动恢复按钮点击`);
+                // 将状态设为超时（error），这样按钮就会恢复可点击
+                this.updateOtaStatus(key, { 
+                  status: 'error', 
+                  desc: '升级超时：30秒无响应，请重试' 
+                });
+                // 如果是当前正在更新的 key，也清空
+                if (this.otaUpdatingKey === key) {
+                  this.otaUpdatingKey = '';
+                }
+              }
+            }
+          });
         },
 
         /**
