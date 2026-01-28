@@ -22,9 +22,9 @@
     "release_delay": { "id": 18, "name": "释放延迟", "description": "制动器释放前的等待时间", "unit": "ms", "type": "number", "min": 0, "max": 1000, "default": 50 }
   },
   "modules": {
-    "WINDOW_R": { "name": "右车窗", "description": "右侧车窗电机控制模块", "allowed_param_ids": [1, 2, 3, 4, 5, 10, 11, 12, 13] },
-    "WINDOW_L": { "name": "左车窗", "description": "左侧车窗电机控制模块", "allowed_param_ids": [1, 2, 3, 4, 5, 10, 11, 12, 13] },
-    "TAIL_GATE_LOCK": { "name": "尾门锁", "description": "尾门锁控制模块", "allowed_param_ids": [7, 8] },
+    "WINDOW_R": { "name": "右车窗", "description": "右侧车窗电机控制模块", "img": "img/device.png", "allowed_param_ids": [1, 2, 3, 4, 5, 10, 11, 12, 13] },
+    "WINDOW_L": { "name": "左车窗", "description": "左侧车窗电机控制模块", "img": "img/device.png", "allowed_param_ids": [1, 2, 3, 4, 5, 10, 11, 12, 13] },
+    "TAIL_GATE_LOCK": { "name": "尾门锁", "description": "尾门锁控制模块", "img": "img/device.png", "allowed_param_ids": [7, 8] },
     "MOTOR_CTRL": { "name": "电机控制", "description": "通用电机控制模块", "allowed_param_ids": [10, 11, 12, 13, 14, 15, 16] },
     "BRAKE_CTRL": { "name": "制动控制", "description": "制动系统控制模块", "allowed_param_ids": [17, 18] }
   }

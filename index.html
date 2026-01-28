@@ -1589,10 +1589,11 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       margin-bottom: 20px;
+      overflow: hidden; /* 确保内部负边距延伸的边框不会超出圆角卡片 */
     }
 
     .device-photo {
-      width: 280px;
+      width: 200px; /* 缩小宽度 */
       height: 200px;
       flex-shrink: 0;
       border-radius: 8px;
@@ -1602,12 +1603,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      align-self: center; /* 上下居中 */
     }
 
     .device-photo img {
-      width: 100%;
-      /* height: 100%; */
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* 居中且不裁剪 */
     }
 
     .device-photo-overlay {
@@ -1636,11 +1638,35 @@
       flex-direction: column;
     }
 
+    .device-overview-content {
+      display: flex;
+      gap: 0;
+      flex: 1;
+    }
+
+    .device-overview-main {
+      width: 180px;
+      flex-shrink: 0;
+    }
+
+    .device-overview-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
     .device-overview-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 16px;
+    }
+
+    .device-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .device-model-name {
@@ -1650,26 +1676,27 @@
     }
 
     .device-info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
     .info-item {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      align-items: flex-start; /* 确保背景和边框不超出内容宽度 */
     }
 
     .info-label {
-      font-size: 11px;
-      color: var(--text-muted);
+      font-size: 12px;
+      color: #000;
     }
 
     .info-value {
-      font-size: 14px;
-      color: var(--text-primary);
+      font-size: 15px;
+      color: #000;
       font-weight: 500;
     }
 
@@ -1680,6 +1707,7 @@
       padding: 2px 8px;
       border-radius: 4px;
       display: inline-block;
+      max-width: fit-content; /* 严格限制宽度 */
     }
 
     .info-value.mono {
@@ -1691,29 +1719,42 @@
     }
 
     .running-model-info {
-      margin-top: auto;
-      padding: 12px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      border-radius: 8px;
+      padding: 10px 20px; /* 缩小上下边距 */
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-self: center; /* 上下居中 */
+      margin-left: -10px; /* 保持与左侧较近但不过度重叠 */
+    }
+
+    .running-model-flex-container {
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
 
     .running-model-info.stopped {
       background: var(--bg-gray);
       border-color: var(--border-color);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
     .running-model-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 3px 10px;
       background: var(--running-color);
       color: white;
       border-radius: 12px;
       font-size: 11px;
       font-weight: 500;
-      margin-bottom: 8px;
+      margin-bottom: 10px; /* 缩小标签下边距 */
+      align-self: flex-start;
     }
 
     .running-model-badge i {
@@ -1722,6 +1763,8 @@
 
     .running-model-badge.stopped {
       background: var(--text-muted);
+      margin-bottom: 0;
+      align-self: center;
     }
 
     .running-model-badge.stopped i {
@@ -1730,18 +1773,65 @@
 
     .running-model-detail {
       display: flex;
-      gap: 8px;
-      font-size: 12px;
+      flex-direction: column;
+      gap: 8px; /* 缩小详情间距 */
+      font-size: 14px;
+      flex: 1;
     }
 
     .running-label {
-      color: var(--text-muted);
+      color: #000;
+      font-size: 12px;
+    }
+
+    .running-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .running-value {
-      color: var(--text-primary);
+      color: #000;
       font-family: var(--font-mono);
-      font-weight: 500;
+      font-weight: 600;
+      word-break: break-all;
+      white-space: nowrap; /* 保证说明性文字不被挤的换行 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-part-image,
+    .module-part-placeholder {
+      width: 200px; /* 相对缩小宽度 */
+      height: 140px; /* 相对缩小高度 */
+      flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid var(--border-color);
+    }
+
+    .module-part-placeholder {
+      border: 1px dashed var(--primary-color);
+      background: rgba(255, 255, 255, 0.6);
+      flex-direction: column;
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .module-part-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .module-part-placeholder i {
+      font-size: 24px;
+      margin-bottom: 6px;
+      color: var(--primary-color);
     }
 
     /* 规格区域 */
@@ -2732,48 +2822,74 @@
                 </div>
                 <div class="device-overview-info">
                   <div class="device-overview-header">
-                    <h3 class="device-model-name">{{ currentDeviceName }}</h3>
-                    <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
-                      {{ deviceConnected ? '在线' : '离线' }}
-                    </el-tag>
-                  </div>
-
-                  <div class="device-info-grid">
-                    <div class="info-item">
-                      <span class="info-label">设备序列号</span>
-                      <span class="info-value sn">{{ deviceInfo.sn || '--' }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="info-label">硬件版本</span>
-                      <span class="info-value">{{ deviceInfo.hardwareVersion || '--' }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="info-label">软件版本</span>
-                      <span class="info-value">{{ deviceInfo.softwareVersion || '--' }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="info-label">运行时间</span>
-                      <span class="info-value highlight">{{ deviceInfo.runTime || '--' }}</span>
+                    <div class="device-header-left">
+                      <h3 class="device-model-name">{{ currentDeviceName }}</h3>
+                      <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
+                        {{ deviceConnected ? '在线' : '离线' }}
+                      </el-tag>
                     </div>
                   </div>
 
-                  <!-- 正在运行的模型 -->
-                  <div class="running-model-info" v-if="deviceConnected && isModelRunning">
-                    <div class="running-model-badge">
-                      <i class="el-icon-video-play"></i>
-                      <span>模型运行中</span>
+                  <div class="device-overview-content">
+                    <div class="device-overview-main">
+                      <div class="device-info-grid">
+                        <div class="info-item">
+                          <span class="info-label">设备序列号</span>
+                          <span class="info-value sn">{{ deviceInfo.sn || '--' }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">软件版本</span>
+                          <span class="info-value">{{ deviceInfo.softwareVersion || '--' }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">硬件版本</span>
+                          <span class="info-value">{{ deviceInfo.hardwareVersion || '--' }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">运行时间</span>
+                          <span class="info-value highlight">{{ deviceInfo.runTime || '--' }}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="running-model-detail">
-                      <span class="running-label">文件:</span>
-                      <span class="running-value">{{ runningFile }}</span>
-                      <span class="running-label">模块:</span>
-                      <span class="running-value">{{ getModuleDisplayName(runningModule) }}</span>
-                    </div>
-                  </div>
-                  <div class="running-model-info stopped" v-else-if="deviceConnected">
-                    <div class="running-model-badge stopped">
-                      <i class="el-icon-video-pause"></i>
-                      <span>模型未运行</span>
+
+                    <div class="device-overview-side">
+                      <!-- 正在运行的模型 -->
+                      <div class="running-model-info" v-if="deviceConnected && isModelRunning">
+                        <div class="running-model-flex-container">
+                          <!-- 展示相关模块部件图片 (高度放大，居中) -->
+                          <div v-if="currentRunningModuleImg" class="module-part-image">
+                            <img :src="currentRunningModuleImg" alt="部件图片" />
+                          </div>
+                          <!-- 预留图片框 -->
+                          <div v-else class="module-part-placeholder">
+                            <i class="el-icon-picture-outline"></i>
+                            <span>部件预览</span>
+                          </div>
+
+                          <!-- 运行详情 (在图片右侧) -->
+                          <div class="running-model-detail">
+                            <!-- 模型运行状态图标 (移入详情列顶部) -->
+                            <div class="running-model-badge">
+                              <i class="el-icon-video-play"></i>
+                              <span>模型运行中</span>
+                            </div>
+                            <div class="running-item">
+                              <span class="running-label">文件:</span>
+                              <span class="running-value">{{ runningFile }}</span>
+                            </div>
+                            <div class="running-item">
+                              <span class="running-label">模块:</span>
+                              <span class="running-value">{{ getModuleDisplayName(runningModule) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="running-model-info stopped" v-else-if="deviceConnected">
+                        <div class="running-model-badge stopped">
+                          <i class="el-icon-video-pause"></i>
+                          <span>模型未运行</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -4347,6 +4463,11 @@ current_output_gain:0.5`
           return spec;
         },
         currentModel() { return this.models[this.activeModelIndex] || null; },
+        currentRunningModuleImg() {
+          if (!this.deviceConnected || !this.isModelRunning || !this.runningModule) return null;
+          const def = this.getModuleDef(this.runningModule);
+          return def ? def.img : null;
+        },
         canApply() {
           return this.deviceConnected && this.isModelRunning &&
             this.currentModel && this.currentModel.success &&
