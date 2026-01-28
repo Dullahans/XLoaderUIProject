@@ -2437,6 +2437,209 @@
     ::-webkit-scrollbar-thumb:hover {
       background: var(--text-muted);
     }
+
+    /* 系统配置弹窗美化 */
+    .system-config-dialog .el-dialog__body {
+      padding: 0;
+      background-color: var(--bg-page);
+    }
+
+    .system-config-tabs {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
+    .system-config-tabs .el-tabs__header {
+      background: var(--bg-white) !important;
+      padding: 0 10px !important;
+      border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .system-config-tabs .el-tabs__item {
+      height: 50px !important;
+      line-height: 50px !important;
+      font-weight: 500 !important;
+    }
+
+    .system-config-tabs .el-tabs__content {
+      padding: 20px !important;
+      height: 550px;
+      overflow-y: auto;
+      background-color: var(--bg-page);
+    }
+
+    .config-tab-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      background: var(--bg-white);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .config-tab-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .config-tab-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .cabinet-config-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .cabinet-config-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-light);
+    }
+
+    .cabinet-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .cabinet-name-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .cabinet-name-box .label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .cabinet-name-box .name-input {
+      width: 240px;
+    }
+
+    .cabinet-ips-section {
+      padding-left: 10px;
+    }
+
+    .ips-header {
+      margin-bottom: 12px;
+    }
+
+    .ips-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ips-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 12px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .ips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ip-item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .ip-input {
+      flex: 1;
+    }
+
+    .ip-input .el-input-group__prepend {
+      background-color: var(--bg-gray);
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0 12px;
+    }
+
+    .ip-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 60px;
+    }
+
+    .action-btn {
+      padding: 5px !important;
+      font-size: 18px !important;
+      transition: transform 0.2s ease;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .action-btn.add {
+      color: var(--primary-color) !important;
+    }
+
+    .action-btn.delete {
+      color: var(--error-color) !important;
+    }
+
+    .add-cabinet-box {
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    .add-cabinet-btn {
+      width: 100%;
+      height: 45px;
+      border-style: dashed !important;
+      border-width: 2px !important;
+      font-size: 14px;
+      font-weight: 500;
+      background-color: transparent !important;
+    }
+
+    .add-cabinet-btn:hover {
+      background-color: var(--primary-bg) !important;
+      border-color: var(--primary-color) !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 
@@ -2737,6 +2940,66 @@
                 :loading="localUpgradeLoading" @click="confirmLocalUpgrade">
                 {{ isAnyDeviceUpgrading ? '有设备正在升级中' : '开始近端升级' }}
               </el-button>
+            </span>
+          </el-dialog>
+
+          <!-- 系统配置弹窗 -->
+          <el-dialog title="系统配置" :visible.sync="dialogSystemConfigVisible" width="750px" custom-class="system-config-dialog">
+            <el-tabs type="border-card" class="system-config-tabs" v-loading="configLoading">
+              <el-tab-pane label="机柜配置">
+                <div class="config-tab-header">
+                  <div class="config-tab-title">机柜列表</div>
+                  <el-button type="primary" size="small" icon="el-icon-plus" @click="addConfigCabinet">添加新机柜</el-button>
+                </div>
+
+                <div v-for="(cabinet, cIdx) in systemConfig.cabinets" :key="cIdx" class="cabinet-config-card">
+                  <div class="cabinet-card-header">
+                    <div class="cabinet-name-box">
+                      <span class="label">机柜名称</span>
+                      <el-input v-model="cabinet.name" size="small" placeholder="请输入机柜名称" class="name-input"></el-input>
+                    </div>
+                    <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="removeConfigCabinet(cIdx)" 
+                      title="删除机柜"></el-button>
+                  </div>
+                  
+                  <div class="cabinet-ips-section">
+                    <div class="ips-header">
+                      <span class="ips-title">机箱 IP 地址列表</span>
+                    </div>
+                    
+                    <div class="ips-list">
+                      <div v-for="(ipObj, iIdx) in cabinet.ips" :key="iIdx" class="ip-item-row">
+                        <el-input v-model="ipObj.ip" size="small" placeholder="例如: 192.168.1.100" class="ip-input">
+                          <template slot="prepend">IP</template>
+                        </el-input>
+                        <div class="ip-actions">
+                          <el-button type="text" icon="el-icon-plus" class="action-btn add" @click="addConfigIp(cabinet)" title="添加 IP"></el-button>
+                          <el-button type="text" icon="el-icon-close" class="action-btn delete" @click="removeConfigIp(cabinet, iIdx)"
+                            title="删除 IP"></el-button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="!systemConfig.cabinets || !systemConfig.cabinets.length" 
+                  style="padding: 60px 0; text-align: center; background: var(--bg-white); border-radius: 12px; border: 1px dashed var(--border-color);">
+                  <i class="el-icon-takeaway-box" style="font-size: 40px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                  <p style="color: var(--text-secondary);">暂无机柜配置，请点击上方按钮添加</p>
+                </div>
+              </el-tab-pane>
+              
+              <el-tab-pane label="其他设置" disabled>
+                <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                  <i class="el-icon-more" style="font-size: 32px; margin-bottom: 10px;"></i>
+                  <p>更多配置项开发中...</p>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+
+            <span slot="footer" class="dialog-footer">
+              <el-button size="small" @click="dialogSystemConfigVisible = false">取消</el-button>
+              <el-button size="small" type="primary" @click="saveSystemConfig">保存配置并应用</el-button>
             </span>
           </el-dialog>
 
@@ -3605,6 +3868,10 @@
         <i class="el-icon-monitor"></i>
         <span>控制台</span>
       </div>
+      <div class="floating-item" @click="openSystemConfig" title="系统配置">
+        <i class="el-icon-setting"></i>
+        <span>系统配置</span>
+      </div>
       <div class="drag-handle" title="上下拖动调整位置">
         <i class="el-icon-rank"></i>
       </div>
@@ -4106,6 +4373,16 @@
         return this.request('load_model_batch', { device_id, loader_num, models_list });
       }
 
+      // --- 34 导入配置信息（load_loader_config） ---
+      loadLoaderConfig() {
+        return this.request('load_loader_config', {});
+      }
+
+      // --- 35 保存配置信息（save_loader_config） ---
+      saveLoaderConfig(conf) {
+        return this.request('save_loader_config', { conf });
+      }
+
       // --- 文件操作（非 socket.md 标准，供 Python FastAPI 后端使用） ---
       saveFile(device_sn, filename, content) {
         return this.request('file.save', { device_sn, filename, content });
@@ -4248,7 +4525,14 @@ current_output_gain:0.5`
         dialogLogVisible: false,
         dialogFetchVisible: false,
         dialogLocalUpgradeVisible: false,
+        dialogSystemConfigVisible: false, // 系统配置弹窗
+        configLoading: false, // 系统配置加载状态
         drawerConsoleVisible: false,
+
+        // 系统配置
+        systemConfig: {
+          cabinets: []
+        },
 
         // 近端升级（hex 文件）
         localUpgradeTarget: { ip: '', loader_num: 0, loader_name: '' },
@@ -5756,6 +6040,115 @@ current_output_gain:0.5`
          * 刷新模型列表（get_models）
          * 响应 data: { ret:true, desc:[{value,label,children:[...]}] }
          */
+        /**
+         * 加载系统配置
+         */
+        async loadSystemConfig() {
+          this.configLoading = true;
+          // 优先从 WebSocket 获取，失败或未连接则尝试 localStorage
+          if (this.wsConnected) {
+            try {
+              const res = await wsClient.loadLoaderConfig();
+              // 处理返回结果，根据文档：{"ret":true,"desc":{"cabinets":{"机柜1":["192.168.0.1",...],...}}}
+              const payload = res && res.data !== undefined ? res.data : res;
+              if (payload && payload.ret && payload.desc && payload.desc.cabinets) {
+                const cabinetsDict = payload.desc.cabinets;
+                const cabinets = Object.keys(cabinetsDict).map(name => ({
+                  name,
+                  ips: cabinetsDict[name].map(ip => ({ ip }))
+                }));
+                this.systemConfig.cabinets = cabinets;
+                // 同时同步到 localStorage 备份
+                localStorage.setItem('xloader_system_config', JSON.stringify(this.systemConfig));
+                this.configLoading = false;
+                return;
+              }
+            } catch (err) {
+              console.warn('[WS] loadLoaderConfig failed, fallback to localStorage:', err);
+            }
+          }
+
+          const saved = localStorage.getItem('xloader_system_config');
+          if (saved) {
+            try {
+              this.systemConfig = JSON.parse(saved);
+            } catch (e) {
+              console.error('解析系统配置失败', e);
+            }
+          }
+          this.configLoading = false;
+        },
+        /**
+         * 打开系统配置弹窗
+         */
+        async openSystemConfig() {
+          this.dialogSystemConfigVisible = true;
+          await this.loadSystemConfig();
+        },
+        /**
+         * 添加机柜配置
+         */
+        addConfigCabinet() {
+          this.systemConfig.cabinets.push({
+            name: `机柜 ${this.systemConfig.cabinets.length + 1}`,
+            ips: [{ ip: '' }]
+          });
+        },
+        /**
+         * 删除机柜配置
+         */
+        removeConfigCabinet(index) {
+          this.systemConfig.cabinets.splice(index, 1);
+        },
+        /**
+         * 为机柜添加 IP
+         */
+        addConfigIp(cabinet) {
+          cabinet.ips.push({ ip: '' });
+        },
+        /**
+         * 删除机柜 IP
+         */
+        removeConfigIp(cabinet, index) {
+          cabinet.ips.splice(index, 1);
+        },
+        /**
+         * 保存系统配置
+         */
+        async saveSystemConfig() {
+          // 1. 保存到 localStorage
+          localStorage.setItem('xloader_system_config', JSON.stringify(this.systemConfig));
+
+          // 2. 如果 WS 已连接，保存到后端
+          if (this.wsConnected) {
+            try {
+              // 转换回后端要求的字典格式
+              const cabinetsDict = {};
+              this.systemConfig.cabinets.forEach(c => {
+                if (c.name) {
+                  cabinetsDict[c.name] = c.ips.map(obj => obj.ip).filter(ip => ip);
+                }
+              });
+
+              const res = await wsClient.saveLoaderConfig({
+                cabinets: cabinetsDict
+              });
+              const payload = res && res.data !== undefined ? res.data : res;
+              if (payload && payload.ret) {
+                this.$message.success('系统配置已保存到服务器');
+              } else {
+                this.$message.warning('配置已保存到本地，但服务器返回失败: ' + (payload.desc || '未知原因'));
+              }
+            } catch (err) {
+              console.error('[WS] saveLoaderConfig failed:', err);
+              this.$message.error('保存到服务器失败，配置已暂存本地');
+            }
+          } else {
+            this.$message.success('系统配置已保存到本地（WebSocket 未连接）');
+          }
+
+          this.dialogSystemConfigVisible = false;
+        },
         async refreshModelOptions() {
           this.modelOptionsLoading = true;
           try {
@@ -7708,6 +8101,9 @@ current_output_gain:0.5`
 
         // 加载设备规格配置
         this.loadDeviceSpecsConfig();
+
+        // 加载系统配置
+        this.loadSystemConfig();
 
         // 初始化悬浮面板拖拽
         this.$nextTick(() => {
