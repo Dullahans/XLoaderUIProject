@@ -1232,7 +1232,7 @@
     /* 参数行 - 增强版 */
     .param-row {
       display: grid;
-      grid-template-columns:  1fr  200px 20px;
+      grid-template-columns: 1fr 200px 20px;
       gap: 20px;
       align-items: start;
       padding: 10px;
@@ -1589,11 +1589,13 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       margin-bottom: 20px;
-      overflow: hidden; /* 确保内部负边距延伸的边框不会超出圆角卡片 */
+      overflow: hidden;
+      /* 确保内部负边距延伸的边框不会超出圆角卡片 */
     }
 
     .device-photo {
-      width: 200px; /* 缩小宽度 */
+      width: 200px;
+      /* 缩小宽度 */
       height: 200px;
       flex-shrink: 0;
       border-radius: 8px;
@@ -1603,13 +1605,15 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      align-self: center; /* 上下居中 */
+      align-self: center;
+      /* 上下居中 */
     }
 
     .device-photo img {
       max-width: 100%;
       max-height: 100%;
-      object-fit: contain; /* 居中且不裁剪 */
+      object-fit: contain;
+      /* 居中且不裁剪 */
     }
 
     .device-photo-overlay {
@@ -1686,7 +1690,8 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      align-items: flex-start; /* 确保背景和边框不超出内容宽度 */
+      align-items: flex-start;
+      /* 确保背景和边框不超出内容宽度 */
     }
 
     .info-label {
@@ -1707,7 +1712,8 @@
       padding: 2px 8px;
       border-radius: 4px;
       display: inline-block;
-      max-width: fit-content; /* 严格限制宽度 */
+      max-width: fit-content;
+      /* 严格限制宽度 */
     }
 
     .info-value.mono {
@@ -1719,14 +1725,17 @@
     }
 
     .running-model-info {
-      padding: 10px 20px; /* 缩小上下边距 */
+      padding: 10px 20px;
+      /* 缩小上下边距 */
       background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
       border: 1px solid rgba(37, 99, 235, 0.15);
       border-radius: 12px;
       display: flex;
       flex-direction: column;
-      align-self: center; /* 上下居中 */
-      margin-left: -10px; /* 保持与左侧较近但不过度重叠 */
+      align-self: center;
+      /* 上下居中 */
+      margin-left: -10px;
+      /* 保持与左侧较近但不过度重叠 */
     }
 
     .running-model-flex-container {
@@ -1753,7 +1762,8 @@
       border-radius: 12px;
       font-size: 11px;
       font-weight: 500;
-      margin-bottom: 10px; /* 缩小标签下边距 */
+      margin-bottom: 10px;
+      /* 缩小标签下边距 */
       align-self: flex-start;
     }
 
@@ -1774,7 +1784,8 @@
     .running-model-detail {
       display: flex;
       flex-direction: column;
-      gap: 8px; /* 缩小详情间距 */
+      gap: 8px;
+      /* 缩小详情间距 */
       font-size: 14px;
       flex: 1;
     }
@@ -1795,15 +1806,18 @@
       font-family: var(--font-mono);
       font-weight: 600;
       word-break: break-all;
-      white-space: nowrap; /* 保证说明性文字不被挤的换行 */
+      white-space: nowrap;
+      /* 保证说明性文字不被挤的换行 */
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .module-part-image,
     .module-part-placeholder {
-      width: 200px; /* 相对缩小宽度 */
-      height: 140px; /* 相对缩小高度 */
+      width: 200px;
+      /* 相对缩小宽度 */
+      height: 140px;
+      /* 相对缩小高度 */
       flex-shrink: 0;
       border-radius: 8px;
       overflow: hidden;
@@ -2637,8 +2651,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
@@ -2944,7 +2965,8 @@
           </el-dialog>
 
           <!-- 系统配置弹窗 -->
-          <el-dialog title="系统配置" :visible.sync="dialogSystemConfigVisible" width="750px" custom-class="system-config-dialog">
+          <el-dialog title="系统配置" :visible.sync="dialogSystemConfigVisible" width="750px"
+            custom-class="system-config-dialog">
             <el-tabs type="border-card" class="system-config-tabs" v-loading="configLoading">
               <el-tab-pane label="机柜配置">
                 <div class="config-tab-header">
@@ -2958,37 +2980,39 @@
                       <span class="label">机柜名称</span>
                       <el-input v-model="cabinet.name" size="small" placeholder="请输入机柜名称" class="name-input"></el-input>
                     </div>
-                    <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="removeConfigCabinet(cIdx)" 
+                    <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="removeConfigCabinet(cIdx)"
                       title="删除机柜"></el-button>
                   </div>
-                  
+
                   <div class="cabinet-ips-section">
                     <div class="ips-header">
                       <span class="ips-title">机箱 IP 地址列表</span>
                     </div>
-                    
+
                     <div class="ips-list">
                       <div v-for="(ipObj, iIdx) in cabinet.ips" :key="iIdx" class="ip-item-row">
                         <el-input v-model="ipObj.ip" size="small" placeholder="例如: 192.168.1.100" class="ip-input">
                           <template slot="prepend">IP</template>
                         </el-input>
                         <div class="ip-actions">
-                          <el-button type="text" icon="el-icon-plus" class="action-btn add" @click="addConfigIp(cabinet)" title="添加 IP"></el-button>
-                          <el-button type="text" icon="el-icon-close" class="action-btn delete" @click="removeConfigIp(cabinet, iIdx)"
-                            title="删除 IP"></el-button>
+                          <el-button type="text" icon="el-icon-plus" class="action-btn add"
+                            @click="addConfigIp(cabinet)" title="添加 IP"></el-button>
+                          <el-button type="text" icon="el-icon-close" class="action-btn delete"
+                            @click="removeConfigIp(cabinet, iIdx)" title="删除 IP"></el-button>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="!systemConfig.cabinets || !systemConfig.cabinets.length" 
+                <div v-if="!systemConfig.cabinets || !systemConfig.cabinets.length"
                   style="padding: 60px 0; text-align: center; background: var(--bg-white); border-radius: 12px; border: 1px dashed var(--border-color);">
-                  <i class="el-icon-takeaway-box" style="font-size: 40px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                  <i class="el-icon-takeaway-box"
+                    style="font-size: 40px; color: var(--text-muted); margin-bottom: 15px;"></i>
                   <p style="color: var(--text-secondary);">暂无机柜配置，请点击上方按钮添加</p>
                 </div>
               </el-tab-pane>
-              
+
               <el-tab-pane label="其他设置" disabled>
                 <div style="padding: 40px; text-align: center; color: var(--text-muted);">
                   <i class="el-icon-more" style="font-size: 32px; margin-bottom: 10px;"></i>
@@ -3082,39 +3106,37 @@
                     <i class="el-icon-warning"></i>
                     <span>设备未连接</span>
                   </div>
-                </div>
-                <div class="device-overview-info">
-                  <div class="device-overview-header">
-                    <div class="device-header-left">
-                      <h3 class="device-model-name">{{ currentDeviceName }}</h3>
-                      <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
-                        {{ deviceConnected ? '在线' : '离线' }}
-                      </el-tag>
-                    </div>
-                  </div>
-
-                  <div class="device-overview-content">
-                    <div class="device-overview-main">
-                      <div class="device-info-grid">
-                        <div class="info-item">
-                          <span class="info-label">设备序列号</span>
-                          <span class="info-value sn">{{ deviceInfo.sn || '--' }}</span>
-                        </div>
-                        <div class="info-item">
-                          <span class="info-label">软件版本</span>
-                          <span class="info-value">{{ deviceInfo.softwareVersion || '--' }}</span>
-                        </div>
-                        <div class="info-item">
-                          <span class="info-label">硬件版本</span>
-                          <span class="info-value">{{ deviceInfo.hardwareVersion || '--' }}</span>
-                        </div>
-                        <div class="info-item">
-                          <span class="info-label">运行时间</span>
-                          <span class="info-value highlight">{{ deviceInfo.runTime || '--' }}</span>
-                        </div>
+                  <div class="device-overview-main">
+                    <div class="device-overview-header">
+                      <div class="device-header-left">
+                        <h3 class="device-model-name">{{ currentDeviceName }}</h3>
+                        <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
+                          {{ deviceConnected ? '在线' : '离线' }}
+                        </el-tag>
                       </div>
                     </div>
-
+                    <div class="device-info-grid">
+                      <div class="info-item">
+                        <span class="info-label">设备序列号</span>
+                        <span class="info-value sn">{{ deviceInfo.sn || '--' }}</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="info-label">软件版本</span>
+                        <span class="info-value">{{ deviceInfo.softwareVersion || '--' }}</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="info-label">硬件版本</span>
+                        <span class="info-value">{{ deviceInfo.hardwareVersion || '--' }}</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="info-label">运行时间</span>
+                        <span class="info-value highlight">{{ deviceInfo.runTime || '--' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="device-overview-info">
+                  <div class="device-overview-content">
                     <div class="device-overview-side">
                       <!-- 正在运行的模型 -->
                       <div class="running-model-info" v-if="deviceConnected && isModelRunning">
@@ -3216,7 +3238,8 @@
                     <span class="realtime-unit">mA</span>
                     <span class="realtime-label">电流</span>
                     <div class="realtime-bar">
-                      <div class="realtime-bar-fill" :style="{ width: (realtimeData.current / 100000 * 100) + '%' }"></div>
+                      <div class="realtime-bar-fill" :style="{ width: (realtimeData.current / 100000 * 100) + '%' }">
+                      </div>
                     </div>
                   </div>
                   <div class="realtime-card">
@@ -3333,7 +3356,8 @@
                       'has-error': model.errors && model.errors.length > 0,
                       'is-running': isFileRunning(model.filename),
                       'drag-over': dragOverModelIndex === index
-                    }" @click="handleSelectModel(index)" draggable="true" @dragstart="handleModelDragStart($event, index)"
+                    }" @click="handleSelectModel(index)" draggable="true"
+                      @dragstart="handleModelDragStart($event, index)"
                       @dragover.prevent="handleModelDragOver($event, index)" @dragleave="handleModelDragLeave($event)"
                       @drop="handleModelDrop($event, index)">
                       <i :class="model.success ? 'el-icon-document' : 'el-icon-document-delete'"></i>
@@ -3658,7 +3682,8 @@
               </el-tree>
             </div>
 
-            <div v-if="selectedResourceNodes.length" style="margin-top: 15px; font-size: 12px; color: var(--primary-color);">
+            <div v-if="selectedResourceNodes.length"
+              style="margin-top: 15px; font-size: 12px; color: var(--primary-color);">
               <strong>已选择 {{ selectedResourceNodes.length }} 个资源</strong>
               <span v-if="resourceLoadingCount > 0" style="margin-left: 10px; color: var(--text-muted);">
                 <i class="el-icon-loading"></i> 正在递归加载子目录...
@@ -3668,7 +3693,8 @@
             <div slot="footer">
               <el-button size="mini" @click="dialogImportDeviceVisible = false" :disabled="isImporting">取消</el-button>
               <el-button size="mini" type="primary" @click="confirmImportDevice"
-                :disabled="!selectedResourceNodes.length || isImporting || resourceLoadingCount > 0" :loading="isImporting">开始导入</el-button>
+                :disabled="!selectedResourceNodes.length || isImporting || resourceLoadingCount > 0"
+                :loading="isImporting">开始导入</el-button>
             </div>
           </el-dialog>
 
@@ -5708,7 +5734,7 @@ current_output_gain:0.5`
           this.localUpgradeLoading = true;
 
           const k = this.otaKey(this.localUpgradeTarget.ip, this.localUpgradeTarget.loader_num);
-          
+
           // 立即显示已启动状态
           this.$message.success('近端升级已启动');
           this.updateOtaStatus(k, { status: 'running', desc: '近端升级中…' });
@@ -7444,7 +7470,7 @@ current_output_gain:0.5`
               }
             }
           }
-          
+
           this.$nextTick(() => {
             this.selectedResourceNodes = tree.getCheckedNodes();
           });
@@ -7494,15 +7520,15 @@ current_output_gain:0.5`
 
           try {
             this.isImporting = true;
-            
+
             const models_list = [];
             const tree = this.$refs.resourceTree;
-            
+
             // 获取所有选中的叶子节点（即文件）
             // 参数1: true 表示仅返回叶子节点
             // 参数2: false 表示不包含半选状态
             const checkedLeafNodesData = tree.getCheckedNodes(true, false);
-            
+
             checkedLeafNodesData.forEach(data => {
               const node = tree.getNode(data);
               if (node) {
@@ -7553,12 +7579,12 @@ current_output_gain:0.5`
                 }
               }
             };
-            
+
             wsClient.on('load_model_batch', progressHandler);
 
             const resp = await wsClient.loadModelBatch(this.device_id, this.loader_num, unique_models_list);
             const payload = (resp && resp.data !== undefined) ? resp.data : resp;
-            
+
             if (payload && payload.ret === false) {
               throw new Error(payload.desc || '批量导入请求失败');
             }
@@ -7816,7 +7842,7 @@ current_output_gain:0.5`
               if (ip === undefined || loader_num === undefined) return;
               const k = self.otaKey(ip, loader_num);
               if (Number.isFinite(p)) self.$set(self.otaProgress, k, p);
-              
+
               if (p >= 100) {
                 // 进度达到 100% 时直接标记为成功
                 self.updateOtaStatus(k, { status: 'success', desc: '升级成功' });
@@ -7910,9 +7936,9 @@ current_output_gain:0.5`
               if (lastUpdate > 0 && (now - lastUpdate > timeoutMs)) {
                 console.warn(`[OTA] 任务超时 (${key}): 30s 无响应，自动恢复按钮点击`);
                 // 将状态设为超时（error），这样按钮就会恢复可点击
-                this.updateOtaStatus(key, { 
-                  status: 'error', 
-                  desc: '升级超时：30秒无响应，请重试' 
+                this.updateOtaStatus(key, {
+                  status: 'error',
+                  desc: '升级超时：30秒无响应，请重试'
                 });
                 // 如果是当前正在更新的 key，也清空
                 if (this.otaUpdatingKey === key) {
