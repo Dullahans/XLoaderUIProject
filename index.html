@@ -591,7 +591,7 @@
       }
 
       50% {
-        opacity: 0.5;
+        opacity: 0.1;
       }
     }
 
@@ -1678,7 +1678,7 @@
     .info-item {
       display: flex;
       flex-direction: column;
-      /* gap: 2px; */
+      gap: 2px;
       align-items: flex-start;
       /* 确保背景和边框不超出内容宽度 */
     }
@@ -1689,7 +1689,7 @@
     }
 
     .info-value {
-      font-size: 15px;
+      font-size: 13px;
       color: #000;
       font-weight: 500;
     }
@@ -1739,10 +1739,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 3px 10px;
-      background: var(--running-color);
-      color: white;
-      border-radius: 12px;
+      font-size: 13px;
+      padding: 2px 10px;
+      background: #eae4f7;
+      color: var(--running-color);
+      border-radius: 8px;
       font-weight: 500;
       /* 缩小标签下边距 */
       align-self: flex-start;
@@ -1750,12 +1751,14 @@
 
     .running-model-badge i {
       animation: pulse 2s infinite;
+      font-size: 16px;
     }
 
     .running-model-badge.stopped {
       background: var(--text-muted);
       margin-bottom: 0;
       align-self: center;
+      color: #fff;
     }
 
     .running-model-badge.stopped i {
@@ -1778,6 +1781,7 @@
     .running-item {
       display: flex;
       flex-direction: column;
+      gap: 2px;
     }
 
     .running-value {
@@ -1788,6 +1792,7 @@
       /* 保证说明性文字不被挤的换行 */
       overflow: hidden;
       text-overflow: ellipsis;
+      font-size: 13px;
     }
 
     .module-part-image {
@@ -1811,8 +1816,7 @@
     }
 
     .module-part-image img {
-      max-width: 100%;
-      max-height: 100%;
+      max-height: 80%;
       object-fit: contain;
     }
 
@@ -4576,7 +4580,7 @@ current_output_gain:0.5`
         showRaw: false,
         expandedModules: {},
         models: [],
-        isModelRunning: true,
+        isModelRunning: false,
         runningFile: '',
         runningModule: '',
         // 设备信息（从接口获取）
