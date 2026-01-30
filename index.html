@@ -1724,6 +1724,7 @@
       gap: 20px;
       align-items: center;
       width: 100%;
+      height: 215px;
     }
 
     .running-model-info.stopped {
@@ -1789,18 +1790,15 @@
       text-overflow: ellipsis;
     }
 
-    .module-part-image,
-    .module-part-placeholder {
+    .module-part-image {
       width: 200px;
-      /* 相对缩小宽度 */
-      height: 140px;
-      /* 相对缩小高度 */
+      height: 100%;
       flex-shrink: 0;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: white;
+      background: var(--bg-gray);
     }
 
     .module-part-placeholder {
@@ -4578,7 +4576,7 @@ current_output_gain:0.5`
         showRaw: false,
         expandedModules: {},
         models: [],
-        isModelRunning: false,
+        isModelRunning: true,
         runningFile: '',
         runningModule: '',
         // 设备信息（从接口获取）
