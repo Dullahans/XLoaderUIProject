@@ -1,0 +1,4 @@
+.el-dialog__body{
+        padding: 20px ;
+   color: #000;
+}

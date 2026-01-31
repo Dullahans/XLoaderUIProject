@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css">
   <script src="https://unpkg.com/vue@2.7.14/dist/vue.min.js"></script>
   <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+  <link rel="stylesheet" href="./assets/reset.css">
   <style>
     :root {
       --primary-color: #2563eb;
@@ -28,7 +29,8 @@
       --bg-white: #ffffff;
       --bg-gray: #f1f5f9;
       --bg-hover: #e2e8f0;
-      --text-primary: #1e293b;
+      /* --text-primary: #1e293b; */
+      --text-primary: #000;
       --text-secondary: #64748b;
       --text-muted: #94a3b8;
       --border-color: #e2e8f0;
@@ -38,7 +40,7 @@
       --font-sans: 'Noto Sans SC', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
       /* 左侧边栏宽度：扩大到原来的 1.5 倍（260px -> 390px） */
-      --sidebar-width: 350px;
+      --sidebar-width: 300px;
       --toolbar-height: 52px;
     }
 
@@ -119,8 +121,6 @@
     }
 
     .sidebar-section .section-title {
-      font-size: 12px;
-      color: var(--text-secondary);
       margin-bottom: 6px;
     }
 
@@ -137,7 +137,6 @@
       background: var(--bg-gray);
       color: var(--text-secondary);
       text-align: center;
-      font-size: 12px;
     }
 
     .empty-hint .muted {
@@ -155,18 +154,15 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8px;
-      font-size: 12px;
-      color: var(--text-secondary);
     }
 
     .lab-name {
       font-weight: 600;
-      color: var(--text-primary);
     }
 
     .lab-count {
-      font-size: 11px;
-      color: var(--text-muted);
+      /* font-size: 11px;
+      color: var(--text-muted); */
     }
 
     .cabinet-card {
@@ -273,8 +269,6 @@
 
     .cabinet-ip-text {
       font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-primary);
     }
 
     .cabinet-body {
@@ -390,8 +384,8 @@
       width: 100%;
       word-break: break-all;
       margin-top: 4px;
-      font-size: 10px;
-      color: var(--text-secondary);
+      font-size: 12px;
+      /* color: var(--text-secondary); */
       white-space: normal;
       /* 多排 */
       overflow: hidden;
@@ -601,10 +595,6 @@
       color: var(--running-color);
     }
 
-    .running-model-info {
-      font-size: 12px;
-    }
-
     .running-file {
       font-family: var(--font-mono);
       color: var(--text-primary);
@@ -804,9 +794,8 @@
 
     .page-tab {
       padding: 6px 16px;
-      font-size: 12px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       background: transparent;
       border: none;
       border-radius: 5px;
@@ -868,12 +857,11 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 6px 12px;
-      font-size: 12px;
+      padding:2px 6px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
       background: var(--bg-white);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -941,9 +929,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
-      font-size: 12px;
       font-weight: 600;
-      color: var(--text-secondary);
     }
 
     .sn-badge {
@@ -1027,7 +1013,6 @@
     }
 
     .model-item-name {
-      font-size: 12px;
       font-weight: 500;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1035,8 +1020,8 @@
     }
 
     .model-item-size {
-      font-size: 10px;
-      color: var(--text-muted);
+      font-size: 12px;
+      /* color: var(--text-muted); */
     }
 
     .model-item-badge {
@@ -1093,21 +1078,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .editor-filename {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 500;
     }
 
     .editor-filename i {
       color: var(--primary-color);
+      margin-right: 3px;
     }
 
     .modified-dot {
@@ -1173,7 +1152,6 @@
     }
 
     .module-name {
-      font-size: 13px;
       font-weight: 600;
       font-family: var(--font-mono);
       color: var(--primary-color);
@@ -1184,20 +1162,17 @@
     }
 
     .module-name-cn {
-      font-size: 12px;
-      color: var(--text-secondary);
       font-weight: normal;
     }
 
     .module-desc {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-muted);
       margin-top: 2px;
     }
 
     .module-count {
-      font-size: 11px;
-      color: var(--text-muted);
+      font-size: 12px;
       background: var(--bg-white);
       padding: 2px 8px;
       border-radius: 10px;
@@ -1222,7 +1197,7 @@
 
     .module-body {
       display: none;
-      padding: 16px 20px;
+      padding: 0 20px;
     }
 
     .module-body.expanded {
@@ -1265,7 +1240,6 @@
     }
 
     .param-key {
-      font-size: 13px;
       color: var(--text-primary);
       font-family: var(--font-mono);
       font-weight: 600;
@@ -1273,7 +1247,7 @@
     }
 
     .param-name-cn {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--primary-color);
       background: rgba(139, 92, 246, 0.1);
       padding: 2px 8px;
@@ -1288,7 +1262,7 @@
     }
 
     .param-range {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-secondary);
       font-family: var(--font-mono);
       display: flex;
@@ -1356,11 +1330,10 @@
     }
 
     .param-type-badge {
-      font-size: 10px;
+      font-size: 12px;
       padding: 2px 6px;
       border-radius: 4px;
       background: var(--bg-gray);
-      color: var(--text-muted);
       text-transform: uppercase;
     }
 
@@ -1434,7 +1407,7 @@
 
     .array-item .el-button {
       padding: 2px;
-      color: var(--text-muted);
+      color: var(--text-primary);
     }
 
     .array-item .el-button:hover {
@@ -1535,8 +1508,7 @@
 
     /* 数据目录提示 */
     .data-path {
-      font-size: 11px;
-      color: var(--text-muted);
+      font-size: 13px;
       padding: 8px 12px;
       background: var(--bg-gray);
       border-radius: 6px;
@@ -1663,12 +1635,12 @@
     }
 
     .info-label {
-      font-size: 11px;
-      color: var(--text-muted);
+      /* font-size: 11px; */
+      /* color: var(--text-muted); */
     }
 
     .info-value {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--text-primary);
       font-weight: 500;
     }
@@ -1711,7 +1683,6 @@
       background: var(--running-color);
       color: white;
       border-radius: 12px;
-      font-size: 11px;
       font-weight: 500;
       margin-bottom: 8px;
     }
@@ -1731,11 +1702,11 @@
     .running-model-detail {
       display: flex;
       gap: 8px;
-      font-size: 12px;
+      /* font-size: 12px; */
     }
 
     .running-label {
-      color: var(--text-muted);
+      /* color: var(--text-muted); */
     }
 
     .running-value {
@@ -1804,10 +1775,6 @@
       font-family: var(--font-mono);
     }
 
-    .spec-label {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
 
     /* 实时数据 */
     .realtime-grid {
@@ -1832,15 +1799,11 @@
     }
 
     .realtime-unit {
-      font-size: 14px;
-      color: var(--text-muted);
       margin-left: 4px;
     }
 
     .realtime-label {
       display: block;
-      font-size: 12px;
-      color: var(--text-muted);
       margin-top: 4px;
     }
 
@@ -1886,7 +1849,6 @@
     .register-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
     }
 
     .register-table thead {
@@ -1930,8 +1892,6 @@
 
     .reg-range {
       margin-top: 4px;
-      font-size: 11px;
-      color: var(--text-muted);
       font-family: var(--font-mono);
     }
 
@@ -1942,7 +1902,6 @@
 
     .reg-desc {
       font-size: 12px;
-      color: var(--text-muted);
       max-width: 200px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2018,8 +1977,6 @@
       gap: 12px;
       padding: 12px 0;
       border-top: 1px solid var(--border-color);
-      font-size: 12px;
-      color: var(--text-muted);
       flex-shrink: 0;
     }
 
@@ -2338,9 +2295,8 @@
     }
 
     .toolbar .bar-label {
-      font-size: 13px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       white-space: nowrap;
     }
 
@@ -2509,8 +2465,6 @@
     }
 
     .action-btn {
-      padding: 5px !important;
-      font-size: 18px !important;
       transition: transform 0.2s ease;
     }
 
@@ -2576,7 +2530,6 @@
           <div v-if="!hasConnectStatus" class="empty-hint">
             <i class="el-icon-info"></i>
             <div>暂无状态数据</div>
-            <div class="muted">等待 get_connect_status 推送…</div>
           </div>
 
           <div v-for="lab in labView" :key="lab.labKey" class="lab-block">
@@ -2683,7 +2636,7 @@
 
           <el-dialog title="日志拉取" :visible.sync="dialogLogVisible" width="650px">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
-              <div style="color: var(--text-muted); font-size: 12px;">
+              <div>
                 仅展示设备 log 目录下的日志文件。
               </div>
               <el-button size="mini" icon="el-icon-refresh" @click="loadLogTree" :loading="logTreeLoading"
@@ -2763,7 +2716,7 @@
           <!-- 工具弹窗：设备升级（socket.md 14/15） -->
           <el-dialog title="设备升级（云端/近端）" :visible.sync="dialogUpgradeVisible" width="1100px">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
-              <div style="color: var(--text-muted); font-size: 12px;">
+              <div >
                 当前展示：loader 名称 / SN / 当前版本 / 云端版本。
               </div>
               <el-button size="mini" type="primary" icon="el-icon-refresh" @click="checkCloudNewVersion"
@@ -2771,7 +2724,7 @@
                 获取云端版本
               </el-button>
             </div>
-            <div style="margin-bottom: 10px; font-size: 12px; color: var(--text-secondary);">
+            <div style="margin-bottom: 10px; ">
               {{ otaCloudStatusText }}
             </div>
 
@@ -2885,12 +2838,12 @@
                 </div>
               </el-tab-pane>
               
-              <el-tab-pane label="其他设置" disabled>
+              <!-- <el-tab-pane label="其他设置" disabled>
                 <div style="padding: 40px; text-align: center; color: var(--text-muted);">
                   <i class="el-icon-more" style="font-size: 32px; margin-bottom: 10px;"></i>
                   <p>更多配置项开发中...</p>
                 </div>
-              </el-tab-pane>
+              </el-tab-pane> -->
             </el-tabs>
 
             <span slot="footer" class="dialog-footer">
@@ -2911,7 +2864,7 @@
                     {{ m.ts }} · {{ m.dir === 'out' ? '发送' : '返回' }}
                   </div>
                   <pre
-                    style="white-space: pre-wrap; word-break: break-word; background: var(--bg-gray); padding:8px; border-radius:8px; font-family: var(--font-mono); font-size:12px; margin-top:4px;">{{ m.text }}</pre>
+                    style="white-space: pre-wrap; word-break: break-word; background: var(--bg-gray); padding:8px; border-radius:8px; font-family: var(--font-mono); font-size:14px; margin-top:4px;">{{ m.text }}</pre>
                 </div>
               </div>
               <div
@@ -2923,7 +2876,7 @@
                     :disabled="!wsConnected || !consoleInput">发送</el-button>
                 </div>
               </div>
-              <div style="margin-top:6px; font-size: 12px; color: var(--text-muted);">
+              <div style="padding: 10px 0;">
                 当前设备：{{ device_id }} #{{ loader_num }}
               </div>
             </div>
@@ -3193,7 +3146,7 @@
                     <div class="model-list-header">
                       <span>模型文件</span>
                       <div style="display:flex; gap:5px; align-items:center;">
-                        <el-button type="text" size="mini" icon="el-icon-plus" @click="handleCreateNewModel"
+                        <el-button type="text"  icon="el-icon-plus" @click="handleCreateNewModel"
                           title="新建模型文件"></el-button>
                       </div>
                     </div>
@@ -3231,15 +3184,15 @@
                         <span class="modified-dot" v-if="hasModified"></span>
                         <el-tag v-if="isFileRunning(currentModel.filename)" size="mini" type="warning" effect="dark"
                           style="margin-left:8px;">
-                          <i class="el-icon-video-play"></i> 运行中
+                          <i class="el-icon-video-play" style="color: #fff;"></i> 运行中
                         </el-tag>
                       </div>
                       <div style="display:flex; gap:10px;">
-                        <el-button type="text" size="mini" icon="el-icon-circle-plus-outline"
+                        <el-button type="text"  icon="el-icon-circle-plus-outline"
                           @click="handleOpenAddModuleDialog">
                           添加模块
                         </el-button>
-                        <el-button type="text" size="mini" icon="el-icon-view" @click="showRaw = !showRaw">
+                        <el-button type="text"  icon="el-icon-view" @click="showRaw = !showRaw">
                           {{ showRaw ? '编辑视图' : '文本视图' }}
                         </el-button>
                       </div>
@@ -3247,14 +3200,14 @@
 
                     <!-- 错误和警告显示 -->
                     <div v-if="currentModel.errors && currentModel.errors.length"
-                      style="margin: 10px; padding: 10px; background: #FEF0F0; border: 1px solid #FDE2E2; border-radius: 4px; color: #F56C6C; font-size: 12px;">
+                      style="margin: 10px; padding: 10px; background: #FEF0F0; border: 1px solid #FDE2E2; border-radius: 4px; color: #F56C6C; font-size: 14px;">
                       <div style="font-weight: bold; margin-bottom: 5px;"><i class="el-icon-error"></i> 解析错误:</div>
                       <div v-for="(err, ei) in currentModel.errors" :key="ei">
                         • {{ err.message }} <span v-if="err.lineNum">(第 {{ err.lineNum }} 行)</span>
                       </div>
                     </div>
                     <div v-if="currentModel.warnings && currentModel.warnings.length"
-                      style="margin: 10px; padding: 10px; background: #FDF6EC; border: 1px solid #FAECD8; border-radius: 4px; color: #E6A23C; font-size: 12px;">
+                      style="margin: 10px; padding: 10px; background: #FDF6EC; border: 1px solid #FAECD8; border-radius: 4px; color: #E6A23C; font-size: 14px;">
                       <div style="font-weight: bold; margin-bottom: 5px;"><i class="el-icon-warning"></i> 警告:</div>
                       <div v-for="(wrn, wi) in currentModel.warnings" :key="wi">
                         • {{ wrn.message }} <span v-if="wrn.lineNum">(第 {{ wrn.lineNum }} 行)</span>
@@ -3264,7 +3217,7 @@
                     <!-- 文本视图 -->
                     <div v-if="showRaw" style="flex: 1; overflow: auto;">
                       <pre
-                        style="background: var(--bg-gray); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; white-space: pre-wrap;">{{ currentModel.raw }}</pre>
+                        style="background: var(--bg-gray); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 14px; line-height: 1.6; white-space: pre-wrap;">{{ currentModel.raw }}</pre>
                     </div>
 
                     <!-- 模块编辑视图 -->
@@ -3299,7 +3252,7 @@
                             <!-- 添加参数按钮 -->
                             <div v-if="expandedModules[mi]"
                               style="padding: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
-                              <el-button type="text" size="mini" icon="el-icon-plus"
+                              <el-button type="text"  icon="el-icon-plus"
                                 @click="handleOpenAddParamDialog(mi)"
                                 :disabled="isModuleRunning(currentModel.filename, mod.name)">
                                 添加参数
@@ -3460,7 +3413,7 @@
               <div v-if="selectedModuleType"
                 style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
                 <div style="font-weight: bold; margin-bottom: 5px;">模块描述:</div>
-                <div style="font-size: 13px; color: #606266;">{{ getModuleDesc(selectedModuleType) }}</div>
+                <div >{{ getModuleDesc(selectedModuleType) }}</div>
               </div>
             </el-form>
             <div slot="footer">
@@ -3485,7 +3438,7 @@
               <div v-if="selectedParamName"
                 style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
                 <div style="font-weight: bold; margin-bottom: 5px;">参数描述:</div>
-                <div style="font-size: 13px; color: #606266;">{{ getParamDef(selectedParamName) ?
+                <div >{{ getParamDef(selectedParamName) ?
                   getParamDef(selectedParamName).description : '无描述' }}</div>
               </div>
             </el-form>
@@ -3557,7 +3510,7 @@
             <div class="page-body register-page" style="display: flex; flex-direction: column;">
               <!-- Sheet 切换 -->
               <div
-                style="display: flex; align-items: center; background: var(--bg-white); border-bottom: 1px solid var(--border-color); padding-left: 10px;">
+                style="display: flex; align-items: center; background: var(--bg-white); border-bottom: 1px solid var(--border-color); ">
                 <el-tabs v-model="activeSheetId" type="card" @tab-remove="handleSheetRemove"
                   style="margin-bottom: -1px;">
                   <el-tab-pane v-for="(sheet, index) in registerSheets" :key="sheet.id" :name="sheet.id"
@@ -3575,7 +3528,7 @@
                     </span>
                   </el-tab-pane>
                 </el-tabs>
-                <el-button size="mini" type="text" icon="el-icon-plus" style="margin-left: 10px; padding: 8px;"
+                <el-button  type="text" icon="el-icon-plus" style="margin-left: 10px; padding: 8px;"
                   @click="handleSheetAdd" title="新建页签（上限5个）"></el-button>
               </div>
 
@@ -4358,7 +4311,7 @@ current_output_gain:0.5`
       data: {
         wsConnected: false,        // WebSocket连接状态
         // 默认按“未连接/未运行”显示，等收到 get_connect_status 或读到寄存器再更新
-        deviceConnected: false,
+        deviceConnected: true,
         deviceSN: '',
         // 对接 start_loader/stop_loader/get_models 的入参（先按文档默认值）
         device_id: '127.0.0.1',
@@ -4449,7 +4402,7 @@ current_output_gain:0.5`
         showRaw: false,
         expandedModules: {},
         models: [],
-        isModelRunning: false,
+        isModelRunning: true,
         runningFile: '',
         runningModule: '',
         // 设备信息（从接口获取）
@@ -7405,7 +7358,7 @@ current_output_gain:0.5`
             const progressHandler = (data) => {
               const payload = (data && data.data !== undefined) ? data.data : data;
               if (payload.desc === 'Finished') {
-                this.$message.success('已完成模型导入');
+                this.$message.success('导入结束');
                 wsClient.off('load_model_batch', progressHandler);
                 this.isImporting = false;
                 this.dialogImportDeviceVisible = false;

@@ -1,0 +1,12 @@
+.el-dialog__body{
+    padding:0 20px ;
+color: #000;
+}
+.el-drawer__header{
+    color: #000;
+    margin-bottom: 20px;
+    padding: 20px 20px 0;
+}
+.el-drawer__body{
+    padding: 0 20px;
+}
