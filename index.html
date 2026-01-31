@@ -40,7 +40,7 @@
       --font-sans: 'Noto Sans SC', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
       /* 左侧边栏宽度：扩大到原来的 1.5 倍（260px -> 390px） */
-      --sidebar-width: 300px;
+      --sidebar-width: 325px;
       --toolbar-height: 52px;
     }
 
@@ -294,16 +294,16 @@
 
     .device-pic {
       position: relative;
-      /* width: 58px; */
-      /* 单体图片增大 */
+     display: flex;
+     align-items: center;
+     justify-content: center;
       height: 78px;
       margin: 0 auto;
     }
 
-    .device-item.selected .device-pic {
-      border-radius: 10px;
+    .device-item.selected .img {
+      border-radius: 4px;
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.55), 0 8px 18px rgba(37, 99, 235, 0.18);
-      background: rgba(37, 99, 235, 0.06);
     }
 
     .device-item.selected .device-model {
@@ -312,7 +312,6 @@
     }
 
     .device-pic img {
-      width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
@@ -384,7 +383,7 @@
       width: 100%;
       word-break: break-all;
       margin-top: 4px;
-      font-size: 12px;
+      font-size: 11px;
       /* color: var(--text-secondary); */
       white-space: normal;
       /* 多排 */
