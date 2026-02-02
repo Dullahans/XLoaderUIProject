@@ -2295,6 +2295,23 @@
     }
 
     /* 系统配置弹窗美化 */
+    .system-config-dialog .el-dialog {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .system-config-dialog .el-dialog__header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-white);
+    }
+
+    .system-config-dialog .el-dialog__title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     .system-config-dialog .el-dialog__body {
       padding: 0;
       background-color: var(--bg-page);
@@ -2316,11 +2333,12 @@
       height: 50px !important;
       line-height: 50px !important;
       font-weight: 500 !important;
+      color: var(--text-primary);
     }
 
     .system-config-tabs .el-tabs__content {
-      padding: 20px !important;
-      height: 550px;
+      padding: 16px 20px !important;
+      height: 560px;
       overflow-y: auto;
       background-color: var(--bg-page);
     }
@@ -2329,16 +2347,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       background: var(--bg-white);
       padding: 12px 16px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
     }
 
     .config-tab-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-primary);
       display: flex;
@@ -2359,23 +2377,22 @@
       background: var(--bg-white);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 20px;
+      padding: 16px;
       margin-bottom: 15px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
       transition: all 0.3s ease;
     }
 
     .cabinet-config-card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: var(--primary-light);
+      border-color: rgba(37, 99, 235, 0.35);
     }
 
     .cabinet-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-light);
     }
 
@@ -2389,24 +2406,24 @@
     .cabinet-name-box .label {
       font-weight: 600;
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 13px;
       white-space: nowrap;
     }
 
     .cabinet-name-box .name-input {
-      width: 240px;
+      width: 260px;
     }
 
     .cabinet-ips-section {
-      padding-left: 10px;
+      padding-left: 4px;
     }
 
     .ips-header {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .ips-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-secondary);
       display: flex;
@@ -2426,7 +2443,7 @@
     .ips-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .ip-item-row {
@@ -2454,25 +2471,70 @@
       min-width: 60px;
     }
 
-    .action-btn {
+    .system-config-dialog .action-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0 !important;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
       transition: transform 0.2s ease;
     }
 
-    .action-btn:hover {
-      transform: scale(1.2);
+    .system-config-dialog .action-btn:hover {
+      background: var(--bg-gray);
+      transform: scale(1.12);
     }
 
-    .action-btn.add {
+    .system-config-dialog .action-btn.add {
       color: var(--primary-color) !important;
     }
 
-    .action-btn.delete {
+    .system-config-dialog .action-btn.delete {
       color: var(--error-color) !important;
     }
 
     .add-cabinet-box {
       margin-top: 10px;
       padding: 10px 0;
+    }
+
+    .system-config-tip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-white);
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .system-config-tip i {
+      color: var(--primary-color);
+    }
+
+    .system-config-empty {
+      padding: 56px 0;
+      text-align: center;
+      background: var(--bg-white);
+      border-radius: 12px;
+      border: 1px dashed var(--border-color);
+    }
+
+    .system-config-empty i {
+      font-size: 40px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .system-config-empty p {
+      color: var(--text-secondary);
+      margin: 0;
     }
 
     @keyframes fadeIn {
@@ -2791,6 +2853,11 @@
                   <el-button type="primary" size="small" icon="el-icon-plus" @click="addConfigCabinet">添加新机柜</el-button>
                 </div>
 
+                <div class="system-config-tip">
+                  <i class="el-icon-info"></i>
+                  <span>打开弹窗会自动从服务端读取配置；保存时会同步到服务端并备份到本地。</span>
+                </div>
+
                 <div v-for="(cabinet, cIdx) in systemConfig.cabinets" :key="cIdx" class="cabinet-config-card">
                   <div class="cabinet-card-header">
                     <div class="cabinet-name-box">
@@ -2822,9 +2889,9 @@
                 </div>
 
                 <div v-if="!systemConfig.cabinets || !systemConfig.cabinets.length" 
-                  style="padding: 60px 0; text-align: center; background: var(--bg-white); border-radius: 12px; border: 1px dashed var(--border-color);">
-                  <i class="el-icon-takeaway-box" style="font-size: 40px; color: var(--text-muted); margin-bottom: 15px;"></i>
-                  <p style="color: var(--text-secondary);">暂无机柜配置，请点击上方按钮添加</p>
+                  class="system-config-empty">
+                  <i class="el-icon-takeaway-box"></i>
+                  <p>暂无机柜配置，请点击上方按钮添加</p>
                 </div>
               </el-tab-pane>
               
