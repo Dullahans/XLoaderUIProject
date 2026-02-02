@@ -2537,6 +2537,31 @@
       margin: 0;
     }
 
+    .ip-item-empty .ip-actions {
+      min-width: 34px;
+      justify-content: flex-end;
+    }
+
+    .ip-input-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ip-input-error .el-input__inner {
+      border-color: var(--error-color) !important;
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.15);
+    }
+
+    .ip-error-text {
+      font-size: 12px;
+      color: var(--error-color);
+      line-height: 1.2;
+      padding-left: 4px;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
@@ -2874,12 +2899,27 @@
                     </div>
                     
                     <div class="ips-list">
-                      <div v-for="(ipObj, iIdx) in cabinet.ips" :key="iIdx" class="ip-item-row">
-                        <el-input v-model="ipObj.ip" size="small" placeholder="例如: 192.168.1.100" class="ip-input">
+                      <div v-if="!cabinet.ips || cabinet.ips.length === 0" class="ip-item-row ip-item-empty">
+                        <el-input size="small" placeholder="尚未配置 IP" class="ip-input" disabled>
                           <template slot="prepend">IP</template>
                         </el-input>
                         <div class="ip-actions">
-                          <el-button type="text" icon="el-icon-plus" class="action-btn add" @click="addConfigIp(cabinet)" title="添加 IP"></el-button>
+                          <el-button type="text" icon="el-icon-plus" class="action-btn add" @click="addConfigIp(cabinet)"
+                            title="添加 IP"></el-button>
+                        </div>
+                      </div>
+                      <div v-for="(ipObj, iIdx) in cabinet.ips" :key="iIdx" class="ip-item-row">
+                        <div class="ip-input-wrap">
+                          <el-input v-model="ipObj.ip" size="small" placeholder="例如: 192.168.1.100"
+                            class="ip-input" :class="{ 'ip-input-error': !!ipObj.error }"
+                            @blur="validateIpField(cabinet, ipObj)">
+                            <template slot="prepend">IP</template>
+                          </el-input>
+                          <div v-if="ipObj.error" class="ip-error-text">{{ ipObj.error }}</div>
+                        </div>
+                        <div class="ip-actions">
+                          <el-button type="text" icon="el-icon-plus" class="action-btn add" @click="addConfigIp(cabinet)"
+                            title="添加 IP"></el-button>
                           <el-button type="text" icon="el-icon-close" class="action-btn delete" @click="removeConfigIp(cabinet, iIdx)"
                             title="删除 IP"></el-button>
                         </div>
@@ -4820,6 +4860,89 @@ current_output_gain:0.5`
         }
       },
       methods: {
+        normalizeIp(ip) {
+          return String(ip || '').trim();
+        },
+        isValidIPv4(ip) {
+          const s = this.normalizeIp(ip);
+          // IPv4: 0.0.0.0 ~ 255.255.255.255
+          const parts = s.split('.');
+          if (parts.length !== 4) return false;
+          for (const p of parts) {
+            if (p === '' || !/^\d+$/.test(p)) return false;
+            // 禁止前导空格已 trim；允许 0、01 这种？这里当作合法但会 normalize 成原样，不额外改写
+            const n = Number(p);
+            if (!Number.isFinite(n) || n < 0 || n > 255) return false;
+          }
+          return true;
+        },
+        validateIpField(cabinet, ipObj) {
+          if (!ipObj) return;
+          ipObj.touched = true;
+          ipObj.ip = this.normalizeIp(ipObj.ip);
+          // 允许空（交由保存时提示/或用户继续填）
+          if (!ipObj.ip) {
+            ipObj.error = '';
+            this.validateAllIps(false);
+            return;
+          }
+          // 格式校验
+          if (!this.isValidIPv4(ipObj.ip)) {
+            ipObj.error = 'IP 格式不正确（IPv4），例如 192.168.1.100';
+            return;
+          }
+          ipObj.error = '';
+          // 重复校验
+          this.validateAllIps(false);
+        },
+        /**
+         * 全量校验：格式 + 重复
+         * @param {boolean} markTouched - 是否将所有字段标记为已触摸（用于保存时强提示）
+         * @returns {boolean} 是否通过
+         */
+        validateAllIps(markTouched = false) {
+          const all = [];
+          const cabinets = (this.systemConfig && Array.isArray(this.systemConfig.cabinets)) ? this.systemConfig.cabinets : [];
+
+          // 先清空重复类错误（保留格式错误）
+          for (const cab of cabinets) {
+            if (!cab || !Array.isArray(cab.ips)) continue;
+            for (const ipObj of cab.ips) {
+              if (!ipObj) continue;
+              if (markTouched) ipObj.touched = true;
+              if (ipObj.ip !== undefined) ipObj.ip = this.normalizeIp(ipObj.ip);
+              // 若已经有格式错误，先不覆盖
+              if (ipObj.ip && !this.isValidIPv4(ipObj.ip)) {
+                ipObj.error = 'IP 格式不正确（IPv4），例如 192.168.1.100';
+                continue;
+              }
+              // 清掉重复错误（后面再打）
+              if (ipObj.error && String(ipObj.error).includes('重复')) ipObj.error = '';
+              if (ipObj.ip) all.push({ cab, ipObj, ip: ipObj.ip });
+            }
+          }
+
+          // 统计重复
+          const map = new Map();
+          for (const item of all) {
+            map.set(item.ip, (map.get(item.ip) || 0) + 1);
+          }
+          for (const item of all) {
+            if ((map.get(item.ip) || 0) > 1) {
+              item.ipObj.error = 'IP 重复，请检查其他机柜/同机柜配置';
+            }
+          }
+
+          // 最终判断
+          for (const cab of cabinets) {
+            if (!cab || !Array.isArray(cab.ips)) continue;
+            for (const ipObj of cab.ips) {
+              if (!ipObj) continue;
+              if (ipObj.error) return false;
+            }
+          }
+          return true;
+        },
         // 辅助：创建 6 个空槽位（供 labView 使用）
         createEmptySlots(ip) {
           return new Array(6).fill(null).map((_, idx) => ({
@@ -5929,7 +6052,7 @@ current_output_gain:0.5`
                 const cabinetsDict = payload.desc.cabinets;
                 const cabinets = Object.keys(cabinetsDict).map(name => ({
                   name,
-                  ips: cabinetsDict[name].map(ip => ({ ip }))
+                  ips: (cabinetsDict[name] || []).map(ip => ({ ip, error: '', touched: false }))
                 }));
                 this.systemConfig.cabinets = cabinets;
                 // 同时同步到 localStorage 备份
@@ -5945,7 +6068,18 @@ current_output_gain:0.5`
           const saved = localStorage.getItem('xloader_system_config');
           if (saved) {
             try {
-              this.systemConfig = JSON.parse(saved);
+              const parsed = JSON.parse(saved);
+              // 兼容旧结构：ips 可能是 string[] 或 {ip}[]
+              if (parsed && parsed.cabinets && Array.isArray(parsed.cabinets)) {
+                parsed.cabinets.forEach(c => {
+                  if (!c.ips) c.ips = [];
+                  c.ips = (c.ips || []).map(x => {
+                    if (typeof x === 'string') return { ip: x, error: '', touched: false };
+                    return { ip: x.ip || '', error: '', touched: false };
+                  });
+                });
+              }
+              this.systemConfig = parsed;
             } catch (e) {
               console.error('解析系统配置失败', e);
             }
@@ -5958,6 +6092,8 @@ current_output_gain:0.5`
         async openSystemConfig() {
           this.dialogSystemConfigVisible = true;
           await this.loadSystemConfig();
+          // 打开后做一次校验（不强制提示，只标红）
+          this.validateAllIps(false);
         },
         /**
          * 添加机柜配置
@@ -5978,18 +6114,29 @@ current_output_gain:0.5`
          * 为机柜添加 IP
          */
         addConfigIp(cabinet) {
-          cabinet.ips.push({ ip: '' });
+          if (!cabinet.ips) this.$set(cabinet, 'ips', []);
+          cabinet.ips.push({ ip: '', error: '', touched: false });
         },
         /**
          * 删除机柜 IP
          */
         removeConfigIp(cabinet, index) {
+          if (!cabinet.ips || !cabinet.ips.length) return;
+          if (index < 0 || index >= cabinet.ips.length) return;
           cabinet.ips.splice(index, 1);
+          // 删除后重新校验重复项（可能解锁之前的重复错误）
+          this.validateAllIps();
         },
         /**
          * 保存系统配置
          */
         async saveSystemConfig() {
+          // 保存前校验（格式 + 重复）
+          if (!this.validateAllIps(true)) {
+            this.$message.error('IP 配置存在错误，请先修正后再保存');
+            return;
+          }
+
           // 1. 保存到 localStorage
           localStorage.setItem('xloader_system_config', JSON.stringify(this.systemConfig));
 
