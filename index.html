@@ -821,6 +821,40 @@
       display: none;
     }
 
+    /* 顶部 tab 融合：内容卡片的上边框由 active tab 来承接 */
+    .content-area > .page-content {
+      border: 1px solid var(--border-color);
+    }
+
+    .content-area > .page-content.active {
+      border-top: none;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    /* 部件仿真页：对齐“模型选择”和“参数编辑”左右边界，按钮高度一致 */
+    .sim-page .model-select-row,
+    .sim-page .page-header,
+    .sim-page .page-body {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .sim-page .model-select-row {
+      padding-top: 12px;
+      padding-bottom: 10px;
+    }
+
+    .sim-page .model-select-sep {
+      height: 14px;
+    }
+
+    .sim-page .model-select-sep::before {
+      height: 2px;
+      opacity: 0.95;
+      background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.28), var(--border-color), rgba(37, 99, 235, 0.28), transparent);
+    }
+
     .page-content.active {
       display: flex;
       flex-direction: column;
@@ -837,6 +871,67 @@
     .page-title {
       font-size: 15px;
       font-weight: 600;
+    }
+
+    /* 部件仿真页（原参数编辑）：模型选择行 */
+    .model-select-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+
+    .model-select-row-top {
+      margin: 0;
+    }
+
+    /* 不用分割线：用“背景+阴影+间距”把模型选择与参数编辑分成两块 */
+    .sim-page .model-select-row {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .sim-page .page-header {
+      margin-top: 0;
+    }
+
+    /* 风格分割线：替代旧分割线（更轻、更贴合整体） */
+    .model-select-sep {
+      margin: 0;
+      height: 10px;
+      position: relative;
+    }
+
+    .model-select-sep::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--border-color), transparent);
+      opacity: 0.9;
+    }
+
+    /* 部件仿真页：保持 page-header 与“设备信息/寄存器管理”一致（不做额外外框） */
+
+    .model-select-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .model-select-spacer {
+      flex: 1;
+      min-width: 10px;
     }
 
     .btn-group {
@@ -891,6 +986,18 @@
       background: #059669;
     }
 
+    .action-btn.danger {
+      background: var(--error-color);
+      border-color: var(--error-color);
+      color: white;
+    }
+
+    .action-btn.danger:hover {
+      background: #dc2626; /* red-600 */
+      border-color: #dc2626;
+      color: white;
+    }
+
     .action-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -907,7 +1014,7 @@
       overflow-y: auto;
     }
 
-    /* 参数编辑页面 */
+    /* 部件仿真页面（原参数编辑） */
     .model-layout {
       display: flex;
       gap: 16px;
@@ -2272,6 +2379,55 @@
       /* 显式设置确保对齐 */
     }
 
+    /* 工具栏内的页面切换（复用 page-tabs，但去掉 margin/shadow，更贴近 toolbar） */
+    .toolbar .toolbar-page-tabs {
+      margin-bottom: -1px; /* 让 tab 和下方内容卡片边框融合 */
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      background: transparent;
+    }
+
+    .toolbar .toolbar-page-tabs .page-tab {
+      padding: 8px 14px;
+      border-radius: 10px 10px 0 0;
+      border: none;
+      position: relative;
+    }
+
+    .toolbar .toolbar-page-tabs .page-tab:hover {
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .toolbar .toolbar-page-tabs .page-tab.active {
+      background: var(--bg-white);
+      color: var(--primary-color);
+      box-shadow: 0 0 0 1px rgba(226, 232, 240, 1);
+      z-index: 2;
+    }
+
+    /* 让激活 tab 与下方内容卡片边框衔接更顺滑（避免边框“硌眼”） */
+    .toolbar .toolbar-page-tabs .page-tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: var(--bg-white);
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
+
+    /* 内容区顶部与 tab 融合：上边框交给 active tab */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 20px 16px;
+      overflow: hidden;
+    }
+
     .toolbar .bar-section {
       display: flex;
       align-items: center;
@@ -2684,44 +2840,18 @@
       <!-- 右侧主区域 -->
       <div class="main-area">
         <div class="toolbar">
-          <!-- 模型选择、刷新、启动、停止功能移至此处 -->
-          <div class="bar-section" style="flex: 1;">
-            <span class="bar-label">模型选择</span>
-            <el-cascader v-model="selectedModelPath" :options="modelOptions" :props="{ expandTrigger: 'hover' }"
-              size="mini" clearable placeholder="请选择项目/模型" style="width: 280px;"></el-cascader>
-            <el-button size="mini" icon="el-icon-refresh" @click="refreshModelOptions" :loading="modelOptionsLoading">
-              刷新
-            </el-button>
-            <el-radio-group v-model="runMode" size="mini" style="margin-left: 10px;" :disabled="isModelRunning">
-              <el-radio-button label="model">模型</el-radio-button>
-              <el-radio-button label="regen">回灌</el-radio-button>
-            </el-radio-group>
-          </div>
-
-          <div class="bar-divider"></div>
-
-          <div class="bar-section">
-            <el-button size="mini" type="success" icon="el-icon-video-play" @click="startSelectedModel"
-              :disabled="!canStartSelected">
-              启动
-            </el-button>
-            <el-button size="mini" type="danger" icon="el-icon-video-pause" @click="stopSelectedModel"
-              :disabled="!canStopSelected">
-              停止
-            </el-button>
+          <!-- 页面切换：放到顶部工具栏（原“模型选择”行的位置） -->
+          <div class="page-tabs toolbar-page-tabs">
+            <button class="page-tab" :class="{ active: activePage === 'info' }"
+              @click="switchPage('info')">设备信息</button>
+            <button class="page-tab" :class="{ active: activePage === 'model' }"
+              @click="switchPage('model')">部件仿真</button>
+            <button class="page-tab" :class="{ active: activePage === 'register' }"
+              @click="switchPage('register')">寄存器管理</button>
           </div>
         </div>
 
         <div class="content-area">
-          <div class="page-tabs">
-            <button class="page-tab" :class="{ active: activePage === 'info' }"
-              @click="switchPage('info')">设备信息</button>
-            <button class="page-tab" :class="{ active: activePage === 'model' }"
-              @click="switchPage('model')">参数编辑</button>
-            <button class="page-tab" :class="{ active: activePage === 'register' }"
-              @click="switchPage('register')">寄存器管理</button>
-          </div>
-
           <!-- 工具弹窗：模型管理（暂不处理） -->
           <el-dialog title="模型管理" :visible.sync="dialogModelVisible" width="520px">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
@@ -3209,8 +3339,29 @@
             </div>
           </div>
 
-          <!-- 参数编辑页 -->
-          <div class="page-content" :class="{ active: activePage === 'model' }">
+          <!-- 部件仿真页（原参数编辑） -->
+          <div class="page-content sim-page" :class="{ active: activePage === 'model' }">
+            <!-- 模型选择：放到参数编辑 tab 顶部 -->
+            <div class="model-select-row model-select-row-top">
+              <span class="model-select-label">模型选择</span>
+              <el-cascader v-model="selectedModelPath" :options="modelOptions" :props="{ expandTrigger: 'hover' }"
+                size="mini" clearable placeholder="请选择项目/模型" style="width: 280px;"></el-cascader>
+              <button class="action-btn" :disabled="modelOptionsLoading" @click="refreshModelOptions">
+                <i class="el-icon-refresh"></i>刷新
+              </button>
+              <el-radio-group v-model="runMode" size="mini" :disabled="isModelRunning">
+                <el-radio-button label="model">模型</el-radio-button>
+                <el-radio-button label="regen">回灌</el-radio-button>
+              </el-radio-group>
+              <span class="model-select-spacer"></span>
+              <button class="action-btn success" :disabled="!canStartSelected" @click="startSelectedModel">
+                <i class="el-icon-video-play"></i>启动
+              </button>
+              <button class="action-btn danger" :disabled="!canStopSelected" @click="stopSelectedModel">
+                <i class="el-icon-video-pause"></i>停止
+              </button>
+            </div>
+            <div class="model-select-sep"></div>
             <div class="page-header">
               <h2 class="page-title">参数编辑</h2>
               <div class="btn-group">
