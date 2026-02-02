@@ -2629,8 +2629,6 @@
                 value="未设置" disabled></el-option>
               <el-option v-for="loc in locationList" :key="loc" :label="loc" :value="loc"></el-option>
             </el-select>
-            <el-button size="mini" type="primary" icon="el-icon-check" circle @click="handleSaveLocation"
-              title="保存实验室位置"></el-button>
           </div>
         </div>
 
@@ -6067,8 +6065,14 @@ current_output_gain:0.5`
           }
         },
 
-        onLocationChanged() {
-          // 选中实验室后，点击保存才会生效
+        onLocationChanged(val) {
+          // 选中实验室后自动保存（替代右侧打勾按钮）
+          if (!val || val === '未设置') return;
+          // 防重复触发（例如初始化赋值/重复选择同一项）
+          if (this._lastAutoSavedLocation === val && Date.now() - (this._lastAutoSavedLocationAt || 0) < 800) return;
+          this._lastAutoSavedLocation = val;
+          this._lastAutoSavedLocationAt = Date.now();
+          this.handleSaveLocation();
         },
 
         /**
