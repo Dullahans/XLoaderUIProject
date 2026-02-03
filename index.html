@@ -846,13 +846,7 @@
     }
 
     .sim-page .model-select-sep {
-      height: 14px;
-    }
-
-    .sim-page .model-select-sep::before {
-      height: 2px;
-      opacity: 0.95;
-      background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.28), var(--border-color), rgba(37, 99, 235, 0.28), transparent);
+      height: 10px;
     }
 
     .page-content.active {
@@ -915,9 +909,9 @@
       right: 0;
       top: 50%;
       transform: translateY(-50%);
-      height: 2px;
-      background: linear-gradient(to right, transparent, var(--border-color), transparent);
-      opacity: 0.9;
+      height: 1px;
+      background: var(--border-color);
+      opacity: 1;
     }
 
     /* 部件仿真页：保持 page-header 与“设备信息/寄存器管理”一致（不做额外外框） */
@@ -1717,6 +1711,22 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 16px;
+    }
+
+    .device-overview-header-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .device-refresh-icon {
+      padding: 4px !important;
+      color: var(--text-secondary);
+    }
+
+    .device-refresh-icon:hover {
+      color: var(--primary-color);
+      background: var(--primary-bg);
     }
 
     .device-model-name {
@@ -3179,10 +3189,6 @@
 
           <!-- 设备信息页 -->
           <div class="page-content" :class="{ active: activePage === 'info' }">
-            <div class="page-header">
-              <h2 class="page-title">设备信息</h2>
-              <el-button size="mini" icon="el-icon-refresh" @click="refreshDeviceInfo">刷新</el-button>
-            </div>
             <div class="page-body">
               <!-- 设备概览卡片 -->
               <div class="device-overview-card">
@@ -3197,9 +3203,15 @@
                 <div class="device-overview-info">
                   <div class="device-overview-header">
                     <h3 class="device-model-name">{{ currentDeviceName }}</h3>
-                    <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
-                      {{ deviceConnected ? '在线' : '离线' }}
-                    </el-tag>
+                    <div class="device-overview-header-actions">
+                      <el-tag :type="deviceConnected ? 'success' : 'info'" size="small">
+                        {{ deviceConnected ? '在线' : '离线' }}
+                      </el-tag>
+                      <el-tooltip content="刷新" placement="top">
+                        <el-button class="device-refresh-icon" type="text" icon="el-icon-refresh" circle size="mini"
+                          @click="refreshDeviceInfo"></el-button>
+                      </el-tooltip>
+                    </div>
                   </div>
 
                   <div class="device-info-grid">
@@ -3780,17 +3792,6 @@
 
           <!-- 寄存器管理页 -->
           <div class="page-content" :class="{ active: activePage === 'register' }">
-            <div class="page-header">
-              <h2 class="page-title">寄存器管理</h2>
-              <div class="page-header-actions">
-                <el-input v-model="registerSearch" placeholder="搜索寄存器..." prefix-icon="el-icon-search" size="mini"
-                  style="width: 200px; margin-right: 10px;" clearable></el-input>
-                <el-button size="mini" icon="el-icon-refresh" @click="refreshSheetRegisters(currentSheet)"
-                  :loading="registerLoading">
-                  刷新当前页
-                </el-button>
-              </div>
-            </div>
             <div class="page-body register-page" style="display: flex; flex-direction: column;">
               <!-- Sheet 切换 -->
               <div
@@ -3814,6 +3815,15 @@
                 </el-tabs>
                 <el-button  type="text" icon="el-icon-plus" style="margin-left: 10px; padding: 8px;"
                   @click="handleSheetAdd" title="新建页签（上限5个）"></el-button>
+
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 8px; padding-right: 6px;">
+                  <el-input v-model="registerSearch" placeholder="搜索寄存器..." prefix-icon="el-icon-search" size="mini"
+                    style="width: 240px;" clearable></el-input>
+                  <el-button type="text" icon="el-icon-refresh" style="padding: 8px;"
+                    @click="refreshSheetRegisters(currentSheet)" :loading="registerLoading">
+                    刷新当前页
+                  </el-button>
+                </div>
               </div>
 
               <!-- 当前 Sheet 的控制项 (仅非 root sheet 显示自动刷新开关) -->
